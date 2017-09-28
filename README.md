@@ -10,7 +10,7 @@ In INSERT mode, press `tab` to complete the word.
 
 - Use [VundleVim](https://github.com/VundleVim/Vundle.vim): 
 
-    Plugin 'leafOfTree/vim-imagine'
+        Plugin 'leafOfTree/vim-imagine'
 
 - Or manual: download `vim-imagine` and drop it in `Vim/vimfiles/`.
 
