@@ -66,7 +66,7 @@ Ex:
 
     " word -> complete word
     whl -> window.href.location
-    syc -> syntastic_html_checkers
+    shc -> syntastic_html_checkers
     mot -> my_obj.text
 
 ---------------------------------------------------------------------------
