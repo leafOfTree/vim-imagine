@@ -11,7 +11,7 @@ CONTENTS                                        *imagine-contents*
     5.Options........................|Options|
 
 ===========================================================================
-1. Intro	                                    *imagine*
+1. Intro	                                    *vim-imagine*
 
 vim-imagine can return the most likely word based on current editing file.
 
