@@ -1,0 +1,163 @@
+*imagine.txt* Complete word with the most likely one
+|license|
+
+===========================================================================
+CONTENTS                                        *imagine-contents*
+
+    1.Intro..........................|imagine|
+    2.Usage..........................|Usage|
+    3.Matches provided...............|Matches|
+    4.Mappings.......................|Mappings|
+    5.Options........................|Options|
+
+===========================================================================
+1. Intro	                                    *imagine*
+
+vim-imagine can return the most likely word based on current editing file.
+
+===========================================================================
+2. Usage                                        *Usage*
+In INSERT mode, press <tab> to complete the word. See |Matches| and |g:imagine_matchchain|.
+
+===========================================================================
+3. Matches                                      *Matches*
+|Prior|, |Capital|, |UnderscoreOrDot|, |Hyphen|, |Dollar|, |Chars|, |Line|:
+Matches can be used in |g:imagine_matchchain|.
+Note: All these matches return the longest matching word.
+---------------------------------------------------------------------------
+Prior                                           *Prior*
+Match word from |g:imagine_prior_words|. Word should start with the same
+letter.
+
+Ex:
+
+    " context
+    let g:imagine_prior_words = ['abc', 'def']
+
+    " word -> complete word
+    ab -> abc
+    ac -> abc
+    de -> def
+    df -> def
+
+
+---------------------------------------------------------------------------
+Capital                                         *Capital*
+Match word with same Capital, useful for camelCase situation.
+
+Ex:
+
+    " context
+    openWindow, getName
+
+    " word -> complete word
+    ow -> openWindow
+    gn -> getName
+    
+
+---------------------------------------------------------------------------
+UnderscoreOrDot                                 *UnderscoreOrDot*
+Match word with same letter after '_' or '.'.
+
+Ex:
+
+    " context
+    window.href.location, syntastic_html_checkers, my_obj.text
+
+    " word -> complete word
+    whl -> window.href.location
+    syc -> syntastic_html_checkers
+    mot -> my_obj.text
+
+---------------------------------------------------------------------------
+Hyphen                                          *Hyphen*
+Match word with same letter after '-'.
+
+Ex:
+
+    " context
+    col-xs-5
+
+    " word -> complete word
+    cx -> col-xs-5
+    cx5 -> col-xs-5
+
+---------------------------------------------------------------------------
+Dollar                                          *Dollar*
+Match word with leader '$'.
+
+Ex:
+
+    " context
+    $scope.apply(), $location
+
+    " word -> complete word
+    sa -> $scope.apply
+    lo -> $location
+
+---------------------------------------------------------------------------
+Chars                                           *Chars*
+Match word with same chars of the typed word.
+
+Ex:
+
+    " context
+    variabletocomplete, longvariabletocomplete
+
+    " word -> complete word
+    vtc -> longvariabletocomplete
+
+---------------------------------------------------------------------------
+Line                                            *Line*
+Match whoe line with same start and end of the typed word. Leading spaces 
+are ingored.
+
+Ex:
+
+    " context
+    a example $ line
+
+    " word -> complete word
+    a$e -> a example $ line
+
+===========================================================================
+4. Mappings                                     *Mappings*
+
+---------------------------------------------------------------------------
+INSERT mode: 
+
+<tab>
+Complete word
+
+<c-f>
+For 'javascript.jsx', toggle use_emmmet or not
+
+---------------------------------------------------------------------------
+NORMAL mode:
+
+<leader>a                                       *addPrior*
+Add current word to prior words
+
+<leader>e
+Toggle use_emmmet or not
+
+===========================================================================
+5. Options                                      *Options*
+
+*g:imagine_matchchain* (default: ['Prior', 'Capital', 'UnderscoreOrDot', 'Hyphen', 'Dollar', 'Chars', 'Line'])
+    Match chain to traverse until get one word to complete.
+
+*g:imagine_prior_words* (default: [])
+    Prior words for |Prior_match|, can be added by setting |g:imagine_prior_words| or
+    mapping |addPrior|. 
+
+*g:imagine_use_emmet* (default: 0)
+    Use emmet or not.
+    If true, specific file types will use emmet_match ingoring
+    the length of typed word.
+    If false, specific file types will use emmet_match
+    when the length of typed word is 1.
+    
+    Specific file types: ["html","css","less","xml","jst","pug","javascript.jsx"]
+
+ vim:tw=78:et:ft=help:norl:
