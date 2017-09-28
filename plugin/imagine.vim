@@ -12,15 +12,18 @@ let g:imagine_prior_words = []
 
 
 if !exists('g:imagine_matchchain')
-    let g:imagine_matchchain = ['Prior', 'Capital', 'UnderscoreOrDot', 'Hyphen', 'Dollar', 'Chars', 'Line']
+    let g:imagine_matchchain = ['Prior', 'Capital', 
+                \'UnderscoreOrDot', 'Hyphen', 'Dollar', 'Chars', 'Line']
 endif
 
 let s:name = 'vim-imagine'
 let s:__DEBUG__ = 1
 let s:max_length = 10
 
-
-function! Init()
+" =========================================================
+" Main function
+" =========================================================
+function! Main()
     " Load settings
     autocmd FileType * :runtime config/settings.vim
     autocmd BufEnter * :runtime config/settings.vim
@@ -28,16 +31,32 @@ function! Init()
     " Mappings
     noremap <leader>a :call AddPriorWords()<cr>
     " emmet config
-    noremap <leader>e :let g:imagine_use_emmet=1-g:imagine_use_emmet<cr>:echo 'imagine_use_emmet: '.g:imagine_use_emmet<cr>
-    autocmd FileType javascript.jsx :inoremap<buffer> <c-f> <esc>:let g:imagine_use_emmet=1-g:imagine_use_emmet<cr>:echo 'imagine_use_emmet: '.g:imagine_use_emmet<cr>a
+    noremap <leader>e :call ToggleEmmet()<cr>
+    autocmd FileType javascript.jsx :inoremap<buffer> <c-f> <esc>:call ToggleEmmet()<cr>a
 
     " can undo, can't traverse complete list
     "autocmd FileType * :inoremap<silent><buffer> <tab> <c-g>u<c-r>=TabRemap()<cr>
     " can't undo, can traverse complete list
     autocmd FileType * :inoremap<silent><buffer> <tab> <c-r>=TabRemap()<cr>
 endfunction
+" =========================================================
+" Main function End
+" =========================================================
 
-call Init()
+call Main()
+
+" =========================================================
+" Helper functions
+" =========================================================
+" Toggle g:imagine_use_emmet
+function! ToggleEmmet()
+    let g:imagine_use_emmet = 1-g:imagine_use_emmet
+    if g:imagine_use_emmet == 1
+        echom '['.s:name.'] Use emmet'
+    else
+        echom '['.s:name.'] Not use emmet'
+    endif
+endfunction
 
 function! TabRemap()
     set undolevels=1000
@@ -405,7 +424,7 @@ function! UnderscoreOrDotMatch(word, lines)
         let regexp_word = word
     endif
     "let regexp_word = join(split(regexp_word, '\zs'), '\w*(\(\))?(_|\.)')
-    let regexp_word = join(split(regexp_word, '\zs'), '\w*(_|\.)')
+    let regexp_word = join(split(regexp_word, '\zs'), '[0-9a-zA-Z]*(_|\.)')
     let regexp_word = pre_char.regexp_word
     let regexp_word = '\v^\$?'.regexp_word.'[0-9a-zA-Z]*>'
 
@@ -521,5 +540,8 @@ function! AddPriorWords()
     echo '['.s:name.'] Prior words: '
     echo g:imagine_prior_words
 endfunction
+" =========================================================
+" Helper functions End
+" =========================================================
 
 " vi:fdm=indent
