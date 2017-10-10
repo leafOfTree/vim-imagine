@@ -15,7 +15,7 @@ if (&filetype == 'html' || &filetype == '')
                 \'c'    : ['class=""', '1h'], 
                 \'r'    : ['return ', ''],     
                 \'cl'   : ["console.log()", '1h'], 
-                \'a'    : ["alert()", '1h'],
+                \'al'    : ["alert()", '1h'],
                 \'\sp'  : ['&nbsp;', ''], 
                 \'\la'  : ['&laquo;',''],  
                 \'\ra'  : ['&raquo;',''], 
@@ -64,6 +64,7 @@ elseif (&filetype == 'pug' || &filetype == '')
                 \'c'    : ["class=''", '1h'], 
                 \'r'    : ['return ', ''],     
                 \'cl'   : ["console.log()", '1h'], 
+                \'al'    : ["alert()", '1h'],
                 \'\sp'  : ['&nbsp;', ''], 
                 \'\la'  : ['&laquo;',''],  
                 \'\ra'  : ['&raquo;',''], 
@@ -149,6 +150,7 @@ elseif &filetype == 'javascript'
                 \'ex'   : ['export ', ''],
                 \'ed'   : ['export default ', ''],
                 \'cl'   : ["console.log()", '1h'], 
+                \'al'    : ["alert()", '1h'],
                 \'type' : ["Object.prototype.toString.call() === '[object ]'", '9h8h'], 
                 \'push' : ["Array.prototype.push.apply()", '2h'],
                 \'gi' : ["getElementById('')", '2h'], 
@@ -158,6 +160,7 @@ elseif &filetype == 'javascript'
                 \'F'    : ["\<bs>function () {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'],
                 \'a'    : ["\<bs>() => {}\<left>\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
                 \'s'    : ["\<bs>() => \<left>\<left>\<left>\<left>\<left>", '$'], 
+                \'S'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
                 \'pd'   : ["preventDefault();", ''],
                 \}
 

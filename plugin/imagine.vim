@@ -32,7 +32,7 @@ function! Main()
     noremap <leader>a :call AddPriorWords()<cr>
     " emmet config
     noremap <leader>e :call ToggleEmmet()<cr>
-    autocmd FileType javascript.jsx :inoremap<buffer> <c-f> <esc>:call ToggleEmmet()<cr>a
+    autocmd FileType html,javascript.jsx :inoremap<buffer> <c-f> <esc>:call ToggleEmmet()<cr>a
 
     " can undo, can't traverse complete list
     "autocmd FileType * :inoremap<silent><buffer> <tab> <c-g>u<c-r>=TabRemap()<cr>
@@ -409,8 +409,6 @@ function! UnderscoreOrDotMatch(word, lines)
     call LogMsg('Underscore Or Dot')
     let word = a:word
     let lines = a:lines
-    "let split_str = '\v(\s|\(|\)|\{|\}|\=|\:|\''|\"|,|;|\<|\>|\[|\]|#|\!|\*)'
-    "let split_str = g:split_str
     let split_str = substitute(g:split_str, '|\\\.', '', 'g')
 
     let pre_char = ''
@@ -423,9 +421,11 @@ function! UnderscoreOrDotMatch(word, lines)
     else
         let regexp_word = word
     endif
-    "let regexp_word = join(split(regexp_word, '\zs'), '\w*(\(\))?(_|\.)')
+
     let regexp_word = join(split(regexp_word, '\zs'), '[0-9a-zA-Z]*(_|\.)')
-    let regexp_word = pre_char.regexp_word
+    if pre_char != ''
+        let regexp_word = pre_char.'[0-9a-zA-Z]*(_|\.)'.regexp_word
+    endif
     let regexp_word = '\v^\$?'.regexp_word.'[0-9a-zA-Z]*>'
 
     let ret = []
