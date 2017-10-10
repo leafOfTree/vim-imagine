@@ -1,12 +1,14 @@
-# Intro
+# imagine.vim
+
+## Intro
 
 vim-imagine can return the most likely word based on current editing file. Suppert [supertab](https://github.com/ervandew/supertab) and [emmet-vim](https://github.com/mattn/emmet-vim)
 
-# Usage
+## Usage
 
 In INSERT mode, press `tab` to complete the word.
 
-# Install
+## Install
 
 - Use [VundleVim](https://github.com/VundleVim/Vundle.vim): 
 
@@ -14,9 +16,9 @@ In INSERT mode, press `tab` to complete the word.
 
 - Or manual: download `vim-imagine` and drop it in `Vim/vimfiles/`.
 
-# Help 
+## Help 
 After installing, see `:h vim-imagine`
-# Matches
+## Matches
 
 Matches can be used in |g:imagine_matchchain|.
 Note: All these matches return the longest matching word.
