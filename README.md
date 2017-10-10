@@ -2,7 +2,7 @@
 
 ## Intro
 
-vim-imagine can return the most likely word based on current editing file. Suppert [supertab](https://github.com/ervandew/supertab) and [emmet-vim](https://github.com/mattn/emmet-vim)
+vim-imagine can return the most likely word based on current editing file. Suppert [supertab](https://github.com/ervandew/supertab) and [emmet-vim](https://github.com/mattn/emmet-vim).
 
 ## Usage
 
@@ -17,7 +17,8 @@ In INSERT mode, press `tab` to complete the word.
 - Or manual: download `vim-imagine` and drop it in `Vim/vimfiles/`.
 
 ## Help 
-After installing, see `:h vim-imagine`
+After installing, see `:h vim-imagine`.
+
 ## Matches
 
 Matches can be used in |g:imagine_matchchain|.
