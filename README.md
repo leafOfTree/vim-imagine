@@ -1,4 +1,5 @@
 # imagine.vim
+A vim compeletion plugin.
 
 ## Intro
 
