@@ -13,7 +13,8 @@ let g:imagine_prior_words = []
 
 if !exists('g:imagine_matchchain')
     let g:imagine_matchchain = ['Prior', 'Capital', 
-                \'UnderscoreOrDot', 'Hyphen', 'Dollar', 'Chars', 'Line']
+                \'UnderscoreOrDot', 'Hyphen', 'Dollar', 
+                \'FirstMatchChars', 'Chars', 'Line']
 endif
 
 let s:name = 'vim-imagine'
@@ -263,7 +264,7 @@ function! FuzzyMatchChain(word)
 
     for method in matchChain
         if NoValidRet(ret)
-            let ret = function(method.'Match')(word, lines)
+            let ret = function(method)(word, lines)
         endif
     endfor
 
@@ -318,7 +319,7 @@ function! LogMsg(msg)
     endif
 endfunction
 
-function! PriorMatch(word, lines)
+function! Prior(word, lines)
     call LogMsg('Prior')
     let ret = []
 
@@ -338,7 +339,7 @@ function! PriorMatch(word, lines)
     return ret
 endfunction
 
-function! HyphenMatch(word, lines)
+function! Hyphen(word, lines)
     call LogMsg('Hyphen')
     let word = a:word
     let lines = a:lines
@@ -370,7 +371,7 @@ function! HyphenMatch(word, lines)
     return ret
 endfunction
 
-function! CapitalMatch(word, lines)
+function! Capital(word, lines)
     call LogMsg('Capital')
     let word = a:word
     let lines = a:lines
@@ -405,7 +406,7 @@ function! CapitalMatch(word, lines)
     return ret
 endfunction
 
-function! UnderscoreOrDotMatch(word, lines)
+function! UnderscoreOrDot(word, lines)
     call LogMsg('Underscore Or Dot')
     let word = a:word
     let lines = a:lines
@@ -441,7 +442,7 @@ function! UnderscoreOrDotMatch(word, lines)
     return ret
 endfunction
 
-function! DollarMatch(word, lines)
+function! Dollar(word, lines)
     call LogMsg('Dollar')
     let word = a:word
     let lines = a:lines
@@ -468,7 +469,33 @@ function! DollarMatch(word, lines)
     return ret
 endfunction
 
-function! CharsMatch(word, lines)
+function! FirstMatchChars(word, lines)
+    call LogMsg('Fisrt Match Chars')
+    let word = a:word
+    let lines = a:lines
+    let split_str = substitute(g:split_str, '|\*', '', 'g')
+
+    let regexp_word = word
+    let regexp_word = join(split(regexp_word, '\zs'), '[.0-9A-Za-z_-]*')
+    let regexp_word = escape(regexp_word, '()@.')
+
+    " Add ^ to match frist character
+    let regexp_word = '\v\S*^'.regexp_word
+
+    let ret = []
+    for l in lines
+        let words = split(l, split_str)
+        let compl_words = filter(words, 'v:val =~ '''.regexp_word.'''')
+        let ret = ret + compl_words
+    endfor
+
+    let ret = sort(ret, "LengthDecrement")
+    let ret = RemoveDumplicateElem(ret)
+    call LogMsg(regexp_word)
+    return ret
+endfunction
+
+function! Chars(word, lines)
     call LogMsg('Chars')
     let word = a:word
     let lines = a:lines
@@ -493,7 +520,7 @@ function! CharsMatch(word, lines)
     return ret
 endfunction
 
-function! LineMatch(word, lines)
+function! Line(word, lines)
     call LogMsg('Line')
     let word = a:word
     let lines = a:lines

@@ -34,7 +34,23 @@ if (&filetype == 'html' || &filetype == '')
                 \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \}
-elseif (&filetype == 'pug' || &filetype == '')
+elseif (&filetype == 'ruby')
+    let dict = {
+                \'p'   : ["puts ", ''], 
+                \}
+
+    let dict_end = {
+                \'E'    : ['{{  }}', '3h'], 
+                \'T'    : ['{%  %}', '3h'], 
+                \'B'    : ['{% block  %}', '3h'], 
+                \'K'    : ['{% endblock %}', ''],
+                \'U'    : ['url_for('''')','2h'], 
+                \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \}
+
+elseif (&filetype == 'pug')
     let dict = {
                 \'nb'   : ["ng-bind=''", '1h'],
                 \'nco'   : ["ng-controller=''", '1h'],
@@ -130,9 +146,10 @@ elseif &filetype == 'scss'
                 \'S'    : ["\<bs>#{}\<left>", '$'], 
                 \}
 
-elseif &filetype == 'javascript'
+elseif &filetype == 'javascript' || &filetype == 'typescript'
     let dict = {
                 \'d'    : ['$', ''], 
+                \'doc'    : ['document', ''], 
                 \'c'    : ['// ', ''], 
                 \'im'   : ['import  from ', '6h'],
                 \'co'   : ['const ', ''],
@@ -201,6 +218,7 @@ elseif &filetype == 'javascript'
                 \'A'    : [' && ', ''], 
                 \'O'    : [' || ', ''], 
                 \'P'    : [' += ', ''], 
+                \'I'    : ['++', ''],
                 \'M'    : [' -= ', ''], 
                 \'N'    : ['!', ''], 
                 \'B'    : [' !== ', ''], 
@@ -213,7 +231,6 @@ elseif &filetype == 'javascript'
                 \'GE': [' >= ', ''],
                 \'LE': [' <= ', ''],
                 \}
-
 elseif &filetype == 'javascript.jsx'
     let dict = {
                 \'c'    : ['// ', ''], 
@@ -257,7 +274,7 @@ elseif &filetype == 'javascript.jsx'
     call extend(dict,dict_react)
 
     let dict_end = {
-                \'V'    : ['={}', '1h'],
+                \'V'    : ['={  }', '2h'],
                 \'Q'    : ["=''", '1h'],
                 \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
