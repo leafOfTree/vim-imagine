@@ -88,7 +88,7 @@ function! TabRemap()
     unlet ret
     let ret = DirectMatch()
     if count([0], ret) == 0
-        return ret
+        return ret[0]
     endif
 
     " emmet match
@@ -176,6 +176,8 @@ function! DirectMatch()
         if flag == '$'
             " For '$', return new_word as it is
             call SetType('Direct')
+            echom "unction () {\<cr>} \<Up>"
+            echom new_word[0] 
             return new_word
         else
             " Else, complete the word with new_word
@@ -195,11 +197,13 @@ function! EmmetMatch()
     if (exists('g:loaded_emmet_vim') && g:loaded_emmet_vim)
         let length = len(g:word)
 
+        " can switch by g:imagine_use_emmet
         let types1 = ["html","css","less","xml","jst","pug","javascript.jsx"]
         let is_types1_use_emmet = count(types1, &filetype) > 0 &&
                     \(length == 1 || g:imagine_use_emmet)
 
-        let types2 = ["javascript","python","vim","markdown"]
+        " can't switch by g:imagine_use_emmet
+        let types2 = ["javascript","python","vim","markdown", "typescript"]
         let is_types2 = count(types2, &filetype) > 0 &&
                     \(length == 1)
         

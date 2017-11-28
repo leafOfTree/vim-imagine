@@ -173,7 +173,7 @@ elseif &filetype == 'javascript' || &filetype == 'typescript'
                 \'gi' : ["getElementById('')", '2h'], 
                 \'dgi' : ["document.getElementById('')", '2h'], 
                 \'gebtn' : ["getElementsByTagName('')[0]", '6h'], 
-                \'f'    : ["unction () {\r}\<up>\<end>\<left>\<left>\<left>", '$'], 
+                \'f'    : ["unction () {\<cr>}\<up>\<end>\<left>\<left>\<left>", '$'], 
                 \'F'    : ["\<bs>function () {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'],
                 \'a'    : ["\<bs>() => {}\<left>\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
                 \'s'    : ["\<bs>() => \<left>\<left>\<left>\<left>\<left>", '$'], 
