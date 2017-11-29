@@ -202,10 +202,18 @@ elseif &filetype == 'javascript' || &filetype == 'typescript'
                 \'etc'  : ["expect().to.contain()", '9h5h'],
                 \}
 
-    call extend(dict,dict_d3)
-    call extend(dict,dict_angular)
-    call extend(dict,dict_react)
-    call extend(dict,dict_test)
+    let dict_typescript = {
+        \'f': ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>\<left>", '$']
+        \}
+
+    if &filetype == 'typescript'
+        call extend(dict, dict_typescript)
+    endif
+
+    call extend(dict, dict_d3)
+    call extend(dict, dict_angular)
+    call extend(dict, dict_react)
+    call extend(dict, dict_test)
 
     let dict_end = {
                 \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 

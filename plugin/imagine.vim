@@ -88,7 +88,7 @@ function! TabRemap()
     unlet ret
     let ret = DirectMatch()
     if count([0], ret) == 0
-        return ret[0]
+        return ret
     endif
 
     " emmet match
@@ -176,9 +176,7 @@ function! DirectMatch()
         if flag == '$'
             " For '$', return new_word as it is
             call SetType('Direct')
-            echom "unction () {\<cr>} \<Up>"
-            echom new_word[0] 
-            return new_word
+            return new_word[0]
         else
             " Else, complete the word with new_word
             " For issue, do complete() twice
