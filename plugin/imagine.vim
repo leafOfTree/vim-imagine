@@ -204,7 +204,7 @@ function! EmmetMatch()
         
         if is_types1_use_emmet || is_types2
             call SetType('Emmet')
-            return emmet#expandAbbr(0, "")
+            return emmet#expandAbbr(1, "")
         endif
     endif
 endfunction
