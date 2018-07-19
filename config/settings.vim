@@ -12,6 +12,7 @@ if (&filetype == 'html' || &filetype == '')
                 \'url'  : ["url_for('')",'2h'], 
                 \'gi' : ["getElementById('')", '2h'], 
                 \'dgi' : ["document.getElementById('')", '2h'], 
+                \'ael' : ["addEventListener('')", '2h'], 
                 \'c'    : ['class=""', '1h'], 
                 \'r'    : ['return ', ''],     
                 \'cl'   : ["console.log()", '1h'], 
@@ -26,6 +27,40 @@ if (&filetype == 'html' || &filetype == '')
 
     let dict_end = {
                 \'E'    : ['{{  }}', '3h'], 
+                \'A'    : ["=''", '1h'],
+                \'T'    : ['{%  %}', '3h'], 
+                \'B'    : ['{% block  %}', '3h'], 
+                \'K'    : ['{% endblock %}', ''],
+                \'U'    : ['url_for('''')','2h'], 
+                \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \}
+elseif (&filetype == 'eruby')
+    let dict = {
+                \'a'    : ['@', ''], 
+                \'e'    : ['<%=  %>', '3h'], 
+                \'t'    : ['{%  %}', '3h'], 
+                \'bl'    : ['{% block  %}{% endblock %}', '9h8h'], 
+                \'k'    : ['{% endblock %}', ''], 
+                \'url'  : ["url_for('')",'2h'], 
+                \'gi' : ["getElementById('')", '2h'], 
+                \'dgi' : ["document.getElementById('')", '2h'], 
+                \'c'    : ['class=""', '1h'], 
+                \'r'    : ['return ', ''],     
+                \'cl'   : ["console.log()", '1h'], 
+                \'al'    : ["alert()", '1h'],
+                \'\sp'  : ['&nbsp;', ''], 
+                \'\la'  : ['&laquo;',''],  
+                \'\ra'  : ['&raquo;',''], 
+                \'\he'  : ['&hellip;', ''], 
+                \'f'    : ["unction() {\r}\<up>\<end>\<left>\<left>\<left>", '$'], 
+                \'F'    : ["\<bs>function() {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
+                \}
+
+    let dict_end = {
+                \'E'    : ['<%  %>', '3h'], 
+                \'A'    : ["=''", '1h'],
                 \'T'    : ['{%  %}', '3h'], 
                 \'B'    : ['{% block  %}', '3h'], 
                 \'K'    : ['{% endblock %}', ''],
@@ -36,6 +71,7 @@ if (&filetype == 'html' || &filetype == '')
                 \}
 elseif (&filetype == 'ruby')
     let dict = {
+                \'a'    : ['@', ''], 
                 \'p'   : ["puts ", ''], 
                 \}
 
@@ -50,6 +86,22 @@ elseif (&filetype == 'ruby')
                 \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \}
 
+elseif (&filetype == 'cpp' || &filetype == 'c')
+    let dict = {
+                \'r'    : ['return ', ''], 
+                \}
+
+    let dict_end = {
+                \'E'    : [' == ', '3h'], 
+                \'T'    : ['{%  %}', '3h'], 
+                \'B'    : ['{% block  %}', '3h'], 
+                \'K'    : ['{% endblock %}', ''],
+                \'U'    : ['url_for('''')','2h'], 
+                \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'-'    : ['->', ''], 
+                \}
 elseif (&filetype == 'pug')
     let dict = {
                 \'nb'   : ["ng-bind=''", '1h'],
@@ -77,6 +129,7 @@ elseif (&filetype == 'pug')
                 \'k'    : ['{% endblock %}', ''], 
                 \'url'  : ['url_for('''')','2h'], 
                 \'gi' : ["getElementById('')", '2h'], 
+                \'ael' : ["addEventListener('')", '2h'], 
                 \'c'    : ["class=''", '1h'], 
                 \'r'    : ['return ', ''],     
                 \'cl'   : ["console.log()", '1h'], 
@@ -88,6 +141,7 @@ elseif (&filetype == 'pug')
                 \}
 
     let dict_end = {
+                \'A'    : ["=''", '1h'],
                 \'E'    : ['{{  }}', '3h'], 
                 \'T'    : ['{%  %}', '3h'], 
                 \'B'    : ['{% block  %}', '3h'], 
@@ -104,6 +158,8 @@ elseif &filetype == 'css'
 
     let dict_end = {
                 \'{'    : ["\r\r\<up>\t", '$'], 
+                \'p'    : [':', ''], 
+                \'P'    : ['::', ''], 
                 \}
 
 elseif &filetype == 'json'
@@ -146,12 +202,12 @@ elseif &filetype == 'scss'
                 \'S'    : ["\<bs>#{}\<left>", '$'], 
                 \}
 
-elseif &filetype == 'javascript' || &filetype == 'typescript'
+elseif (&filetype == 'javascript' || &filetype == 'typescript')
     let dict = {
                 \'d'    : ['$', ''], 
                 \'doc'    : ['document', ''], 
                 \'c'    : ['// ', ''], 
-                \'im'   : ['import  from ', '6h'],
+                \'im'   : ["import {  } from ''", '9h1h'],
                 \'co'   : ['const ', ''],
                 \'con'  : ['constructor', ''],
                 \'pro'  : ['prototype.', ''],
@@ -167,12 +223,14 @@ elseif &filetype == 'javascript' || &filetype == 'typescript'
                 \'ex'   : ['export ', ''],
                 \'ed'   : ['export default ', ''],
                 \'cl'   : ["console.log()", '1h'], 
+                \'cd'   : ["console.dir(, {depth: null})", '9h7h'],
                 \'al'    : ["alert()", '1h'],
                 \'type' : ["Object.prototype.toString.call() === '[object ]'", '9h8h'], 
                 \'push' : ["Array.prototype.push.apply()", '2h'],
                 \'gi' : ["getElementById('')", '2h'], 
                 \'dgi' : ["document.getElementById('')", '2h'], 
                 \'gebtn' : ["getElementsByTagName('')[0]", '6h'], 
+                \'ael' : ["addEventListener('')", '2h'], 
                 \'f'    : ["unction () {\<cr>}\<up>\<end>\<left>\<left>\<left>", '$'], 
                 \'F'    : ["\<bs>function () {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'],
                 \'a'    : ["\<bs>() => {}\<left>\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
@@ -203,7 +261,11 @@ elseif &filetype == 'javascript' || &filetype == 'typescript'
                 \}
 
     let dict_typescript = {
-        \'f': ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>\<left>", '$']
+        \'m': ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>\<left>", '$']
+        \}
+
+    let dict_end_typescript = {
+        \'M': ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>", '$']
         \}
 
     if &filetype == 'typescript'
@@ -227,11 +289,81 @@ elseif &filetype == 'javascript' || &filetype == 'typescript'
                 \'O'    : [' || ', ''], 
                 \'P'    : [' += ', ''], 
                 \'I'    : ['++', ''],
-                \'M'    : [' -= ', ''], 
+                \'M'    : ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>", '$'],
+                \'N'    : ['!', ''], 
+                \'B'    : [' !== ', ''], 
+                \'D'    : ['document', ''],
+                \'S'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
+                \}
+
+    if &filetype == 'typescript'
+        call extend(dict_end, dict_end_typescript)
+    endif
+
+    let dict_end_2 = {
+                \'DE'    : ['--', ''], 
+                \'IC'    : ['++', ''], 
+                \'GE': [' >= ', ''],
+                \'LE': [' <= ', ''],
+                \}
+elseif (&filetype == 'java')
+    let dict = {
+                \'pu'    : ['public ', ''], 
+                \'pr'    : ['private ', ''], 
+                \'sta'    : ['static ', ''], 
+                \'v'    : ['void ', ''], 
+                \'str'    : ['String ', ''], 
+                \'p'    : ['System.out.println("");', '3h'], 
+                \'d'    : ['$', ''], 
+                \'doc'    : ['document', ''], 
+                \'c'    : ['// ', ''], 
+                \'im'   : ["import {  } from ''", '9h1h'],
+                \'co'   : ['const ', ''],
+                \'con'  : ['constructor', ''],
+                \'pro'  : ['prototype.', ''],
+                \'ins'  : ['instanceof ', ''],
+                \'has'  : ['hasOwnProperty()', '1h'],
+                \'req'  : ["require('')", '2h'],
+                \'t'    : ['this',''],
+                \'r'    : ['return ', ''], 
+                \'u'    : ['undefined', ''], 
+                \'mr'   : ['Math.random()', ''],
+                \'me'   : ['module.exports', ''],
+                \'ex'   : ['export ', ''],
+                \'ed'   : ['export default ', ''],
+                \'cl'   : ["console.log()", '1h'], 
+                \'al'    : ["alert()", '1h'],
+                \'type' : ["Object.prototype.toString.call() === '[object ]'", '9h8h'], 
+                \'push' : ["Array.prototype.push.apply()", '2h'],
+                \'gi' : ["getElementById('')", '2h'], 
+                \'dgi' : ["document.getElementById('')", '2h'], 
+                \'gebtn' : ["getElementsByTagName('')[0]", '6h'], 
+                \'f'    : ["unction () {\<cr>}\<up>\<end>\<left>\<left>\<left>", '$'], 
+                \'F'    : ["\<bs>function () {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'],
+                \'a'    : ["\<bs>() => {}\<left>\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
+                \'s'    : ["\<bs>() => \<left>\<left>\<left>\<left>\<left>", '$'], 
+                \'S'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
+                \'pd'   : ["preventDefault();", ''],
+                \}
+
+    let dict_end = {
+                \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'['    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'<'    : ["< />", '3h'], 
+                \'>'    : ["\<cr>\<cr>\<esc>a\<esc>==a\<up>\<tab>", '$'], 
+                \'E'    : [" === ", ''], 
+                \'V'    : [" == ", ''], 
+                \'A'    : [' && ', ''], 
+                \'O'    : [' || ', ''], 
+                \'P'    : [' += ', ''], 
+                \'I'    : ['++', ''],
+                \'M'    : ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>", '$'],
                 \'N'    : ['!', ''], 
                 \'B'    : [' !== ', ''], 
                 \'D'    : ['document', ''],
                 \}
+
 
     let dict_end_2 = {
                 \'DE'    : ['--', ''], 
@@ -265,13 +397,13 @@ elseif &filetype == 'javascript.jsx'
                 \'gi' : ["getElementById('')", '2h'], 
                 \'dgi' : ["document.getElementById('')", '2h'], 
                 \'gebtn' : ["getElementsByTagName('')[0]", '6h'], 
-                \'f'    : ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>", '$'], 
+                \'f'    : ["unction () {\<cr>}\<up>\<end>\<left>\<left>\<left>", '$'], 
                 \'F'    : ["\<bs>function () {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'],
                 \'a'    : ["\<bs>() => {}\<left>\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
-                \'s'    : ["\<bs>() => \<left>\<left>\<left>\<left>\<left>", '$'], 
-                \'S'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
+                \'S'    : ["\<bs>() => \<left>\<left>\<left>\<left>\<left>", '$'], 
+                \'s'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
                 \'pd'   : ["preventDefault();", ''],
-                \'cn'   : ["\<bs>\<bs>className=''\<left>", '$'],
+                \'cn'   : ["\<bs>\<bs>className={}\<left>", '$'],
                 \}
 
     let dict_react = {
@@ -282,20 +414,20 @@ elseif &filetype == 'javascript.jsx'
     call extend(dict,dict_react)
 
     let dict_end = {
-                \'V'    : ['={  }', '2h'],
-                \'Q'    : ["=''", '1h'],
+                \'V'    : ['={}', '1h'],
+                \'L'    : ['=""', '1h'],
                 \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'['    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'<'    : ["< />", '3h'], 
-                \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'>'    : ["\<cr>\<up>\<tab>", '$'], 
                 \'E'    : [" === ", ''], 
                 \'F'    : ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>", '$'], 
                 \'S'    : ["\<bs> => ", '$'], 
                 \'A'    : [' && ', ''], 
                 \'O'    : [' || ', ''], 
                 \'P'    : [' += ', ''], 
-                \'M'    : [' -= ', ''], 
+                \'M': ["\<bs>() {\r}\<up>\<end>\<left>\<left>\<left>", '$'],
                 \'I'    : ['++', ''], 
                 \'D'    : ['--', ''], 
                 \'N'    : ['!', ''], 
@@ -343,7 +475,8 @@ elseif &filetype == 'markdown'
                 \'h3'   : ['### ', ''],
                 \'h4'   : ['#### ', ''],
                 \'js'   : ["\<bs>\<bs>```js\<cr>\<cr>```\<up>", '$'],
-                \'c'    : ["``\<cr>```\<up>", '$']    
+                \'c'    : ["\<bs>```\<cr>```\<up>", '$'],
+                \'C'    : ["\<bs>```javascript\<cr>\<cr>```\<up>", '$']    
                 \}
 elseif &filetype == 'python'
     let dict = {
@@ -412,7 +545,9 @@ elseif &filetype == 'gitcommit'
     let module = 'cfgitems'
     let module = 'deploys'
     let module = 'tasks'
-    let module = g:current_module
+    if exists('g:current_module')
+        let module = g:current_module
+    endif
     let dict = {
                 \'fe'    : ['feat(module: '.module.'): ', ''], 
                 \'Fe'    : ['feat: ', ''], 

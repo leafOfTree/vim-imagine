@@ -7,9 +7,8 @@ if exists('g:loaded_imagine') || &cp
 endif
 
 let g:loaded_imagine = 1
-let g:imagine_use_emmet = 0
+let b:imagine_use_emmet = 0
 let g:imagine_prior_words = []
-
 
 if !exists('g:imagine_matchchain')
     let g:imagine_matchchain = ['Prior', 'Capital', 
@@ -33,7 +32,7 @@ function! Main()
     noremap <leader>a :call AddPriorWords()<cr>
     " emmet config
     noremap <leader>e :call ToggleEmmet()<cr>
-    autocmd FileType html,javascript.jsx :inoremap<buffer> <c-f> <esc>:call ToggleEmmet()<cr>a
+    autocmd FileType html,javascript.jsx,eruby,pug :inoremap<buffer> <c-f> <esc>:call ToggleEmmet()<cr>a
 
     " can undo, can't traverse complete list
     "autocmd FileType * :inoremap<silent><buffer> <tab> <c-g>u<c-r>=TabRemap()<cr>
@@ -49,10 +48,14 @@ call Main()
 " =========================================================
 " Helper functions
 " =========================================================
-" Toggle g:imagine_use_emmet
+" Toggle b:imagine_use_emmet
 function! ToggleEmmet()
-    let g:imagine_use_emmet = 1-g:imagine_use_emmet
-    if g:imagine_use_emmet == 1
+    if !exists('b:imagine_use_emmet')
+        let b:imagine_use_emmet = 1
+    else
+        let b:imagine_use_emmet = 1-b:imagine_use_emmet
+    endif
+    if b:imagine_use_emmet == 1
         echom '['.s:name.'] Use emmet'
     else
         echom '['.s:name.'] Not use emmet'
@@ -195,13 +198,15 @@ function! EmmetMatch()
     if (exists('g:loaded_emmet_vim') && g:loaded_emmet_vim)
         let length = len(g:word)
 
-        " can switch by g:imagine_use_emmet
-        let types1 = ["html","css","less","xml","jst","pug","javascript.jsx"]
+        " length 1
+        " can switch by b:imagine_use_emmet
+        let types1 = ["html","css","less","xml","vim","jst","typescript","pug","ant", "eruby", "javascript.jsx", "javascript"]
         let is_types1_use_emmet = count(types1, &filetype) > 0 &&
-                    \(length == 1 || g:imagine_use_emmet)
+                    \(length == 1 || (exists('b:imagine_use_emmet') && b:imagine_use_emmet))
 
-        " can't switch by g:imagine_use_emmet
-        let types2 = ["javascript","python","vim","markdown", "typescript"]
+        " length 1
+        " can't switch by b:imagine_use_emmet
+        let types2 = ["python","markdown", 'cpp', 'c']
         let is_types2 = count(types2, &filetype) > 0 &&
                     \(length == 1)
         
@@ -574,3 +579,4 @@ endfunction
 " =========================================================
 
 " vi:fdm=indent
+
