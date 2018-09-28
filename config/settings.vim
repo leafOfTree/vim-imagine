@@ -1,8 +1,16 @@
+" dict: word
+" dict_end: prev 1 char
+" dict_end_2: prev 2 chars
+
+" default value
 let dict = {}
-let dict_end = {}
+let dict_end = {
+      \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+      \'L'    : ['=""', '1h'],
+      \}
 let dict_end_2 = {}
 
-if (&filetype == 'html' || &filetype == '')
+if (&filetype == 'html'  || &filetype == 'xml' || &filetype == '')
     let dict = {
                 \'d'    : ['$', ''], 
                 \'e'    : ['{{  }}', '3h'], 
@@ -10,8 +18,8 @@ if (&filetype == 'html' || &filetype == '')
                 \'bl'    : ['{% block  %}{% endblock %}', '9h8h'], 
                 \'k'    : ['{% endblock %}', ''], 
                 \'url'  : ["url_for('')",'2h'], 
-                \'gi' : ["getElementById('')", '2h'], 
-                \'dgi' : ["document.getElementById('')", '2h'], 
+                \'gebi' : ["getElementById('')", '2h'], 
+                \'dgebi' : ["document.getElementById('')", '2h'], 
                 \'ael' : ["addEventListener('')", '2h'], 
                 \'c'    : ['class=""', '1h'], 
                 \'r'    : ['return ', ''],     
@@ -27,7 +35,7 @@ if (&filetype == 'html' || &filetype == '')
 
     let dict_end = {
                 \'E'    : ['{{  }}', '3h'], 
-                \'A'    : ["=''", '1h'],
+                \'L'    : ['=""', '1h'],
                 \'T'    : ['{%  %}', '3h'], 
                 \'B'    : ['{% block  %}', '3h'], 
                 \'K'    : ['{% endblock %}', ''],
@@ -36,6 +44,7 @@ if (&filetype == 'html' || &filetype == '')
                 \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \}
+                "\'>'    : ["\<cr>\<up>\<tab>", '$'], 
 elseif (&filetype == 'eruby')
     let dict = {
                 \'a'    : ['@', ''], 
@@ -45,7 +54,7 @@ elseif (&filetype == 'eruby')
                 \'k'    : ['{% endblock %}', ''], 
                 \'url'  : ["url_for('')",'2h'], 
                 \'gi' : ["getElementById('')", '2h'], 
-                \'dgi' : ["document.getElementById('')", '2h'], 
+                \'dgebi' : ["document.getElementById('')", '2h'], 
                 \'c'    : ['class=""', '1h'], 
                 \'r'    : ['return ', ''],     
                 \'cl'   : ["console.log()", '1h'], 
@@ -60,7 +69,7 @@ elseif (&filetype == 'eruby')
 
     let dict_end = {
                 \'E'    : ['<%  %>', '3h'], 
-                \'A'    : ["=''", '1h'],
+                \'L'    : ['=""', '1h'],
                 \'T'    : ['{%  %}', '3h'], 
                 \'B'    : ['{% block  %}', '3h'], 
                 \'K'    : ['{% endblock %}', ''],
@@ -80,6 +89,29 @@ elseif (&filetype == 'ruby')
                 \'T'    : ['{%  %}', '3h'], 
                 \'B'    : ['{% block  %}', '3h'], 
                 \'K'    : ['{% endblock %}', ''],
+                \'U'    : ['url_for('''')','2h'], 
+                \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'>'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \}
+
+elseif (&filetype == 'php')
+    let dict = {
+                \'d'    : ['$', ''],
+                \'ec'   : ['echo ;', '1h'], 
+                \'p'    : ['print();', '2h'], 
+                \'pn'   : ['print("\n");', '1r'], 
+                \'vd'    : ['var_dump();', '2h'], 
+                \'r'    : ['return ', '1h'], 
+                \'en'   : ['echo "\n";', '1r'],
+                \'a'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
+                \}
+
+    let dict_end = {
+                \'E'    : [' === ', ''], 
+                \'I'    : ['++', ''], 
+                \'P'    : ['::', ''], 
+                \'M'    : ["\<bs>()\<cr>{}\<up>\<end>\<left>", '$'],
                 \'U'    : ['url_for('''')','2h'], 
                 \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
@@ -228,7 +260,7 @@ elseif (&filetype == 'javascript' || &filetype == 'typescript')
                 \'type' : ["Object.prototype.toString.call() === '[object ]'", '9h8h'], 
                 \'push' : ["Array.prototype.push.apply()", '2h'],
                 \'gi' : ["getElementById('')", '2h'], 
-                \'dgi' : ["document.getElementById('')", '2h'], 
+                \'dgebi' : ["document.getElementById('')", '2h'], 
                 \'gebtn' : ["getElementsByTagName('')[0]", '6h'], 
                 \'ael' : ["addEventListener('')", '2h'], 
                 \'f'    : ["unction () {\<cr>}\<up>\<end>\<left>\<left>\<left>", '$'], 
@@ -237,6 +269,8 @@ elseif (&filetype == 'javascript' || &filetype == 'typescript')
                 \'s'    : ["\<bs>() => \<left>\<left>\<left>\<left>\<left>", '$'], 
                 \'S'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
                 \'pd'   : ["preventDefault();", ''],
+                \'ap'   : ['@param ', ''],
+                \'ar'   : ['@return', ''],
                 \}
 
     let dict_d3 = {
@@ -336,7 +370,7 @@ elseif (&filetype == 'java')
                 \'type' : ["Object.prototype.toString.call() === '[object ]'", '9h8h'], 
                 \'push' : ["Array.prototype.push.apply()", '2h'],
                 \'gi' : ["getElementById('')", '2h'], 
-                \'dgi' : ["document.getElementById('')", '2h'], 
+                \'dgebi' : ["document.getElementById('')", '2h'], 
                 \'gebtn' : ["getElementsByTagName('')[0]", '6h'], 
                 \'f'    : ["unction () {\<cr>}\<up>\<end>\<left>\<left>\<left>", '$'], 
                 \'F'    : ["\<bs>function () {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'],
@@ -395,15 +429,18 @@ elseif &filetype == 'javascript.jsx'
                 \'type' : ["Object.prototype.toString.call() === '[object ]'", '9h8h'], 
                 \'push' : ["Array.prototype.push.apply()", '2h'],
                 \'gi' : ["getElementById('')", '2h'], 
-                \'dgi' : ["document.getElementById('')", '2h'], 
+                \'dgebi' : ["document.getElementById('')", '2h'], 
                 \'gebtn' : ["getElementsByTagName('')[0]", '6h'], 
                 \'f'    : ["unction () {\<cr>}\<up>\<end>\<left>\<left>\<left>", '$'], 
                 \'F'    : ["\<bs>function () {  }\<left>\<left>\<left>\<left>\<left>\<left>", '$'],
                 \'a'    : ["\<bs>() => {}\<left>\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
-                \'S'    : ["\<bs>() => \<left>\<left>\<left>\<left>\<left>", '$'], 
+                \'S'    : ["\<bs>() => ()\<left>\<left>\<left>\<left>\<left>\<left>\<left>", '$'], 
                 \'s'    : ["\<bs> => \<left>\<left>\<left>\<left>", '$'], 
                 \'pd'   : ["preventDefault();", ''],
-                \'cn'   : ["\<bs>\<bs>className={}\<left>", '$'],
+                \'ap'   : ['@param ', ''],
+                \'ar'   : ['@return', ''],
+                \'cn'   : ["\<bs>\<bs>className=\"\"\<left>", '$'],
+                \'js'   : ["JSON.stringify()", '1h'],
                 \}
 
     let dict_react = {
@@ -490,13 +527,14 @@ elseif &filetype == 'python'
                 \'p'    : ['print()', '1h'], 
                 \'r'    : ['return ', ''], 
                 \'s'    : ['self', ''], 
-                \'u'    : ['____', '2h'], 
+                \'_'    : ['____', '2h'], 
                 \'"'    : ['""""""', '3h'], 
                 \'a'    : ['@', ''], 
                 \'c'    : ['# ', ''], 
                 \}
     let dict_end = {
                 \'{'    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
+                \'('    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'['    : ["\<cr>\<cr>\<up>\<tab>", '$'], 
                 \'<'    : ["<<\<cr>\<cr>>>>\<up>", '$'], 
                 \'V'    : [" == ", ''], 
