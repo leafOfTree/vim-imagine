@@ -22,7 +22,7 @@ In INSERT mode, press <tab> to complete the word. See |Matches| and |g:imagine_m
 ===========================================================================
 3. Matches                                      *Matches*
 |Prior|, |Capital|, |UnderscoreOrDot|, |Hyphen|, |Dollar|, |Chars|, |Line|:
-Matches can be used in |g:imagine_matchchain|.
+Matches can be defined in |g:imagine_matchchain|. Vim-imagine will traverse the chain in order until a matching word is returned.
 Note: All these matches return the longest matching word.
 ---------------------------------------------------------------------------
 Prior                                           *Prior*

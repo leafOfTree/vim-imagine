@@ -22,7 +22,8 @@ After installing, see `:h vim-imagine`.
 
 ## Matches
 
-Matches can be used in |g:imagine_matchchain|.
+Matches can be defined in |g:imagine_matchchain|. Vim-imagine will traverse the chain in order until a matching word is returned.
+
 Note: All these matches return the longest matching word.
 
 ---------------------------------------------------------------------------

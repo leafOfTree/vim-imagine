@@ -1,6 +1,6 @@
 " vim-imagine.vim - Complete word with the most likely one
-" Maintainer: Leaf
-" Version 0.1
+" Maintainer: leaf <leafvocation@gmail.com>
+" Repository: https://github.com/leafOfTree/vim-imagine
 
 if exists('g:loaded_imagine') || &cp
   finish
