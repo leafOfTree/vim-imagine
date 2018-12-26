@@ -19,10 +19,6 @@ if !exists('g:vim_imagine_matchchain')
         \]
 endif
 
-" =========================================================
-" Main function
-" =========================================================
-
 " Mappings
 noremap <leader>a :call imagine#AddPriorWords()<cr>
 noremap <leader>e :call imagine_emmet#ToggleEmmet()<cr>
