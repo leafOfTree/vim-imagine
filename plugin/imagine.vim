@@ -22,15 +22,6 @@ endif
 " =========================================================
 " Main function
 " =========================================================
-augroup vim_imagine
-  autocmd!
-  " default inoremap <c-f> to toggle emmet
-  autocmd FileType html,xml,vue,javascript.jsx,javascript.vue,eruby,pug,less,css 
-        \:inoremap<buffer> <c-f> <esc>:call imagine_emmet#ToggleEmmet()<cr>a
-
-  " default use emmet
-  autocmd FileType html,pug,xml,css,less :let g:imagine_use_emmet = 1
-augroup end
 
 " Mappings
 noremap <leader>a :call imagine#AddPriorWords()<cr>

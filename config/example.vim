@@ -618,4 +618,4 @@ endif
 let g:vim_imagine_dict = dict
 let g:vim_imagine_dict_end = dict_end
 let g:vim_imagine_dict_end2 = dict_end2
-"}}}
+" vim: fdm=indent
