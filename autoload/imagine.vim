@@ -6,7 +6,7 @@ endif
 
 let s:fuzzy_dict = {}
 let s:name = 'vim-imagine'
-let s:max_length = 10
+let s:max_length = 15
 let s:action_dict = {'h': "\<left>", 'r': "\<cr>"}
 let s:splits = '\v(\s|\(|\)|\{|\}|\=|\:|\''|\"|,|;|\<|\>|\[|\]|\/|\\|\+|\!|#|*|`|\.)'
 let s:filetype = ''

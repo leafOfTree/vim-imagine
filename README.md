@@ -3,7 +3,12 @@ A vim compeletion plugin.
 
 ## Intro
 
-vim-imagine can return the most likely word based on current editing file. Suppert [supertab](https://github.com/ervandew/supertab) and [emmet-vim](https://github.com/mattn/emmet-vim).
+vim-imagine can return the most likely word based on current editing file. Suppert [supertab]() and [emmet-vim]().
+
+Features
+
+    - Support [supertab][0]
+    - Support [emmet-vim][1]
 
 ## Usage
 
@@ -134,3 +139,6 @@ Ex:
 
     " word -> complete word
     a$e -> a example $ line
+
+[0]: https://github.com/ervandew/supertab
+[1]: https://github.com/mattn/emmet-vim
