@@ -1,7 +1,5 @@
 if !exists('g:imagine_prior_words')
   let g:imagine_prior_words = []
-else
-  let g:imagine_prior_words = g:imagine_prior_words
 endif
 
 let s:fuzzy_dict = {}
@@ -148,7 +146,7 @@ function! s:DirectMatch(word, column) abort
   " Load config when filetype is changed
   if &filetype !=? s:filetype
     let s:filetype = &filetype
-    runtime config/imagine.vim
+    runtime imagine_config.vim
   endif
 
   let column = a:column
