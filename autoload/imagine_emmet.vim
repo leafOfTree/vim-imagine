@@ -1,17 +1,11 @@
-if !exists('g:imagine_use_emmet')
-  let g:imagine_use_emmet = 0
-endif
-
+" call s:InitUseEmmetVariable()
 let s:name = 'vim-imagine'
 
-" Toggle g:imagine_use_emmet
+" Toggle b:imagine_use_emmet
 function! imagine_emmet#ToggleEmmet() abort
-  if !exists('g:imagine_use_emmet')
-    let g:imagine_use_emmet = 1
-  else
-    let g:imagine_use_emmet = 1-g:imagine_use_emmet
-  endif
-  if g:imagine_use_emmet == 1
+  call s:InitUseEmmetVariable()
+  let b:imagine_use_emmet = 1-b:imagine_use_emmet
+  if b:imagine_use_emmet == 1
     echom '['.s:name.'] Use emmet'
   else
     echom '['.s:name.'] Not use emmet'
@@ -19,6 +13,7 @@ function! imagine_emmet#ToggleEmmet() abort
 endfunction
 
 function! imagine_emmet#EmmetMatch(word, line) abort
+  call s:InitUseEmmetVariable()
   let length = len(a:word)
 
   " length is 1 or 
@@ -36,11 +31,19 @@ function! imagine_emmet#EmmetMatch(word, line) abort
   if is_types1_use_emmet || is_types2
     call s:SetType('Emmet')
 
+    " emmet#expandAbbr(mode, abbr) range abort
     if match(a:line, '\v(\=\>)|(\})') != -1
       return emmet#expandAbbr(1, "")
     else
       return emmet#expandAbbr(0, "")
     endif 
+  endif
+endfunction
+
+
+function! s:InitUseEmmetVariable()
+  if !exists('b:imagine_use_emmet')
+    let b:imagine_use_emmet = 0
   endif
 endfunction
 
@@ -54,12 +57,14 @@ endfunction
 function! s:LogMsg(msg, ...) abort
   if exists("g:vim_imagine_debug")
         \ && g:vim_imagine_debug == 1
-    if type(a:msg) == 3
+    " List
+    if type(a:msg) == 3 
       for i in a:msg
         echom '== '.i
       endfor
     else
-      if a:0 == 1 && a:1 == 'warning'
+      " String
+      if a:0 == 1 && a:1 == 'warning' 
         echohl WarningMsg
         echom '['.s:name.'] '. a:msg[0:100]
         echohl None
@@ -69,3 +74,4 @@ function! s:LogMsg(msg, ...) abort
     endif
   endif
 endfunction
+
