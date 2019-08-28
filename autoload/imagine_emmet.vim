@@ -23,7 +23,7 @@ function! imagine_emmet#EmmetMatch(word, line) abort
 
   " length is 1 or 
   " can switch by g:imagine_use_emmet
-  let types1 = ["html","css","less","xml","vim","jst","typescript","pug","ant", "eruby", "javascript.jsx", "javascript", "php", "javascript.vue"]
+  let types1 = ["html","css","less","xml","vim","jst","typescript","pug","ant", "eruby", "javascript.jsx", "javascript", "php", "vue", "svelte"]
   let is_types1_use_emmet = count(types1, &filetype) > 0 &&
         \(length == 1 || (exists('g:imagine_use_emmet') && g:imagine_use_emmet))
 
