@@ -1,20 +1,43 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Config {{{
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:vim_imagine_debug = 0
 let g:vim_imagine_matchchain = [
       \'capital', 
       \'hyphen', 
       \'dot', 
       \'underscore', 
-      \'chars',
+      \'include',
       \]
 
 let s:test = {}
 
+let s:test.lines = [
+      \'These are contexts',
+      \'hello html document.body.append(node)',
+      \'hello html document.getElementById("node")',
+      \'let vim_imagine_debug = 1',
+      \'let vim_imagine_matchchain = []',
+      \'import React from react componentWillMount () {...}',
+      \'from react componentWillUnmount () {...}',
+      \]
+"}}}
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Functions {{{
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Run test
 function! s:test.run(test_data, test_name)
   if len(a:test_data) != 2
     call s:LogWarningMsg('test_data should be a list of length 2')
   endif
   let [line, expect] = a:test_data
-  let column = len(line)+2
+  let column = len(line) + 1
   let ret = imagine#TabRemap(line, column, self.lines)
   if ret != expect
     let msg = a:test_name.' failed. '
@@ -26,6 +49,7 @@ function! s:test.run(test_data, test_name)
   endif
 endfunction
 
+" Log
 function! s:LogWarningMsg(msg)
   echohl WarningMsg
   echom '[Test]: '.a:msg
@@ -36,12 +60,10 @@ function! s:LogMsg(msg)
   echom '[Test]: '.a:msg
 endfunction
 
-"""
-""" Function: Define test case
-""" Format: test_data = [input_word, output_expected]
-"""
+" Define test case
+" Format: test_data = [input, output]
 function! s:test.Prior()
-  let g:imagine_prior_words = ['super', 'men', 'hero']
+  let g:vim_imagine_fuzzy_favoured_words = ['super', 'men', 'hero']
   let test_data = ['he', 'hero']
   return test_data
 endfunction
@@ -53,42 +75,45 @@ endfunction
 
 function! s:test.DirectMatch()
   let g:vim_imagine_test_dict = {
-        \'gi' : ["getElementById('')", ''], 
+        \'e'     : '{{ | }}', 
+        \'f'     : 'function () {}', 
         \}
-  let test_data = ['gi', "getElementById('')"]
+
+  let test_data  = ['e', '{{ | }}']
   return test_data
 endfunction
 
-let s:test.lines = [
-        \'These are contexts',
-        \'hello html document.body.append(node)',
-        \'hello html document.getElementById("node")',
-        \'let vim_imagine_debug = 1',
-        \'let vim_imagine_matchchain = []',
-        \'import React from react componentWillMount () {...}',
-        \'from react componentWillUnmount () {...}',
-        \]
+function! s:test.FuzzyMatch_capital()
+  let test_data = ['cwm', "componentWillMount"]
+  return test_data
+endfunction
 
 function! s:test.FuzzyMatch_dot()
   let test_data = ['dba', "document.body.append"]
   return test_data
 endfunction
+
 function! s:test.FuzzyMatch_hyphen()
   let test_data = ['vid', "vim_imagine_debug"]
   return test_data
 endfunction
-function! s:test.FuzzyMatch_capital()
-  let test_data = ['cwm', "componentWillMount"]
-  return test_data
-endfunction
-function! s:test.FuzzyMatch_chars()
-  let test_data = ['ctx', "contexts"]
+
+function! s:test.FuzzyMatch_include()
+  let test_data = ['txt', "contexts"]
   return test_data
 endfunction
 
-for key in keys(s:test)
-  if key != 'lines' && key != 'run'
-    let test_data = s:test[key]()
-    call s:test.run(test_data, key)
-  endif
-endfor
+function s:StartTest()
+  call s:LogMsg('--------- Test starts ------------')
+  for key in keys(s:test)
+    if key != 'lines' && key != 'run'
+      let test_data = s:test[key]()
+      call s:test.run(test_data, key)
+    endif
+  endfor
+endfunction
+
+call s:StartTest()
+"}}}
+
+" vim: fdm=marker

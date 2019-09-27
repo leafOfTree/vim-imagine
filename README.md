@@ -1,13 +1,20 @@
-# imagine.vim
-A vim compeletion plugin.
+# vim-imagine
 
-## Intro
+A simple context-based vim compeletion plugin. 
 
-vim-imagine can return the most likely word based on current editing file. Suppert [supertab](https://github.com/ervandew/supertab) and [emmet-vim](https://github.com/mattn/emmet-vim).
+It wil try to return the most possible word based on current context. Choosing a word from the menu should be avoided.
+
+Supports
+
+- Literial <kbd>tab</kbd>
+- Custom snippets.
+- [Extensible fuzzy match](#fuzzy_match).
+- [emmet-vim][0].
+- [supertab][1].
 
 ## Usage
 
-In INSERT mode, press `tab` to complete the word.
+In INSERT mode, press <kbd>tab</kbd> to complete the word, press <kbd>c-u</kbd> to undo the completion.
 
 ## Install
 
@@ -15,122 +22,171 @@ In INSERT mode, press `tab` to complete the word.
 
         Plugin 'leafOfTree/vim-imagine'
 
-- Or manual: download `vim-imagine` and drop it in `Vim/vimfiles/`.
+- Or manually, clone this plugin, drop it in custom `path/to/this_plugin`, and add it to `rtp` in vimrc
 
-## Help 
-After installing, see `:h vim-imagine`.
+        set rpt+=path/to/this_plugin
 
-## Matches
+## How it works
 
-Matches can be defined in |g:imagine_matchchain|. Vim-imagine will traverse the chain in order until a matching word is returned.
+vim-imagine tries these methods in order to find out the completion word.
 
-Note: All these matches return the longest matching word.
+- Literial <kbd>tab</kbd>.
+- Custom snippets.
+- Extensible fuzzy match.
+- [emmet-vim][0].
+- [supertab][1].
 
----------------------------------------------------------------------------
+### Literial <kbd>tab</kbd>
 
-**Prior**                                           
+It will return literial <kbd>tab</kbd> if there are blanks or the start of line before the cursor.
 
-Match word from |g:imagine_prior_words|. Word should start with the same
-letter.
+### Custom snippets
 
-Ex:
+It will return the snippet if the characters before the cursor match the key in the dictionary.
 
-    " context
-    let g:imagine_prior_words = ['abc', 'def']
+### Extensible fuzzy search <a name="fuzzy_match"></a>
 
-    " word -> complete word
-    ab -> abc
-    ac -> abc
-    de -> def
-    df -> def
+It will return the first match that fuzzy methods find in current file. The longest will be used if there are more than one matched words.
 
----------------------------------------------------------------------------
+#### Builtin methods
 
-**Capital**                                         
+- hyphen
 
-Match word with same Capital, useful for camelCase situation.
+        adg -> abc-def-ghi
 
-Ex:
+- capital
 
-    " context
-    openWindow, getName
+        adg -> abcDefGhi
 
-    " word -> complete word
-    ow -> openWindow
-    gn -> getName
+- dot
+
+        adg -> abc.def.ghi
+
+    **Note**: context words won't be split by `.` in this method
     
+- underscore
 
----------------------------------------------------------------------------
+        adg -> abc_def_ghi
 
-**UnderscoreOrDot**                                 
+- include
 
-Match word with same letter after '_' or '.'.
+        xyz -> 000x111y222z
 
-Ex:
 
-    " context
-    window.href.location, syntastic_html_checkers, my_obj.text
+#### Custom methods 
 
-    " word -> complete word
-    whl -> window.href.location
-    shc -> syntastic_html_checkers
-    mot -> my_obj.text
+All methods defined in `g:vim_imagine_fuzzy_custom_methods` are used in fuzzy completion. See [example](#custom_methods_eample).
 
----------------------------------------------------------------------------
+### Emmet
 
-**Hyphen**                                          
+It will return [emmet-vim][0]'s result when there is only one character before the cursor or `b:vim_imagine_use_emmet` is 1. This happends only if it's installed.
 
-Match word with same letter after '-'.
+### Supertab
 
-Ex:
+It will return [supertab][1]'s result if it's installed. It's worth nothing that <kbd>tab</kbd> can't be used to move in popup menu, but <kbd>up</kbd>, <kbd>down</kbd>, <kbd>enter</kbd> still work
 
-    " context
-    col-xs-5
+## Configuration
 
-    " word -> complete word
-    cx -> col-xs-5
-    cx5 -> col-xs-5
+### Variables
 
----------------------------------------------------------------------------
+`g:vim_imagine_snippets_path`
 
-**Dollar**                                          
+- description: the path of the snippets file under the `runtimepath`.
+- type: `string`.
+- default: `'plugin/imagine_snippets.vim'`. 
 
-Match word with leader '$'.
+It's recommended to put it in `.vim` or `vimfiles`. The only requirement is that these variables 
+`g:vim_imagine_dict`,
+`g:vim_imagine_dict_1`,
+`g:vim_imagine_dict_2`
+are defined as expected. If the path is not readable, [the example snippets](/setting/example_snippets.vim) will be used.
 
-Ex:
+`g:vim_imagine_fuzzy_chain` 
 
-    " context
-    $scope.apply(), $location
+- description: the order of methods that fuzzy search uses.
+- type: `list`.
+- default: 
 
-    " word -> complete word
-    sa -> $scope.apply
-    lo -> $location
+    ```vim
+    let g:vim_imagine_fuzzy_chain = [
+        \'capital', 
+        \'hyphen', 
+        \'dot', 
+        \'underscore', 
+        \'include',
+        \]
+    ```
 
----------------------------------------------------------------------------
+`g:vim_imagine_fuzzy_custom_methods`
 
-**Chars**                                           
+- description: defines custom methods that fuzzy search uses.
+- type: `dictionary`.
 
-Match word with same chars of the typed word.
+    - members: `chars => regexp`. The `chars` is the characters before the cursor and the `regexp` is used to match words in current file. The member name can be used in `g:vim_imagine_fuzzy_chain`.
 
-Ex:
+    - members end with `_splits`: `splits => modified splits`. Modify `splits` which determines how words is generated from current file. Default is a comma-separated string(comma and space will always be added).
 
-    " context
-    variabletocomplete, longvariabletocomplete
+            (,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.
+        
 
-    " word -> complete word
-    vtc -> longvariabletocomplete
+- default: `{}`
+- <a name="custom_methods_eample"></a>example: 
 
----------------------------------------------------------------------------
+    ```vim
+    let g:vim_imagine_fuzzy_custom_methods = {}
 
-**Line**                                            
+    function! g:vim_imagine_fuzzy_custom_methods.same_first(chars)
+      let case_flag = ''
+      if a:chars =~ '\v\C[A-Z]'
+        let case_flag = '\C'
+      endif
 
-Match whoe line with same start and end of the typed word. Leading spaces 
-are ingored.
+      let regexp = join(split(a:chars, '\zs'), '.*')
+      let regexp = '\v'.case_flag.'^(\@|\$)?'.regexp.'.*>'
+      return regexp
+    endfunction
 
-Ex:
+    let g:vim_imagine_fuzzy_chain = [
+        \'capital', 
+        \'hyphen', 
+        \'dot', 
+        \'underscore', 
+        \'same_first',
+        \'include',
+        \]
+    ```
 
-    " context
-    a example $ line
+`g:vim_imagine_fuzzy_favoured_words`
 
-    " word -> complete word
-    a$e -> a example $ line
+- description: The words to check firstly when fuzzy search starts. The list can also be changed while editing files by <kbd>leader</kbd> <kbd>a</kbd> in NORMAL mode.
+- type: `list`.
+- default: `[]`
+
+### Mappings
+
+#### INSERT mode
+
+- <kbd>tab</kbd>: complete the chars before the cursor
+
+- <kbd>c-u</kbd>: undo the completion. 
+
+    ```vim
+    let g:vim_imagine_mapping_undo_completion = '<c-u>'
+    ```
+
+- <kbd>c-f</kbd>: toggle emmet
+
+    ```vim
+    let g:vim_imagine_mapping_toggle_emmet = '<c-f>'
+    ```
+
+#### NORMAL mode
+
+- <kbd>leader</kbd> <kbd>a</kbd>: add the word under the cursor to favoured words <a name="add_favoured_word"></a>
+
+    ```vim
+    let g:vim_imagine_mapping_add_favoured_word = '<leader>a'
+    ```
+
+[0]: https://github.com/mattn/emmet-vim
+[1]: https://github.com/ervandew/supertab

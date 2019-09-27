@@ -1,30 +1,81 @@
-if !exists('g:imagine_prior_words')
-  let g:imagine_prior_words = []
-endif
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Vim autoload file
+"
+" Maintainer: leaf <leafvocation@gmail.com>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let s:fuzzy_dict = {}
-let s:name = 'vim-imagine'
-let s:max_length = 15
-let s:action_dict = {'h': "\<left>", 'r': "\<cr>"}
-let s:splits = '\v(\s|\(|\)|\{|\}|\=|\:|\''|\"|,|;|\<|\>|\[|\]|\/|\\|\+|\!|#|*|`|\.)'
-let s:filetype = ''
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Config {{{
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! s:GetConfig(name, default)
+  return exists(a:name) ? eval(a:name) : a:default
+endfunction
+
+let s:snippets_path = 
+      \s:GetConfig('g:vim_imagine_snippets_path', 'plugin/imagine_snippets.vim')
+
+let s:fuzzy_chain = s:GetConfig('g:vim_imagine_fuzzy_chain',  
+      \[
+      \  'capital', 
+      \  'hyphen', 
+      \  'dot', 
+      \  'underscore', 
+      \  'include',
+      \])
+
+let s:fuzzy_custom_methods = 
+      \ s:GetConfig('g:vim_imagine_fuzzy_custom_methods', {})
+
+let g:vim_imagine_fuzzy_favoured_words = 
+      \ s:GetConfig('g:vim_imagine_fuzzy_favoured_words', [])
+
 let s:loaded_emmet_vim = exists('g:loaded_emmet_vim') 
       \&& g:loaded_emmet_vim
 
+let b:vim_imagine_use_emmet = s:GetConfig('b:vim_imagine_use_emmet', 0)
+"}}}
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Variables {{{
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let s:name = 'vim-imagine'
+let s:leader_char_regexp = '\v[0-9A-Za-z-$_{(<>`]'
+let s:chars_regexp = '\v[0-9A-Za-z-$_\\]'
+
+" Space and comma are added by default
+let s:splits = '(,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.' 
+let s:snippets_path_example = 'setting/example_snippets.vim'
+let s:fuzzy_methods = {}
+let s:fuzzy_method = ''
+" Avoid overuse of memory
+let s:fuzzy_chars_max_length = 15
+let s:type = ''
+let s:filetype = ''
+let s:snippet_result = ''
+let s:emmet_special_line_regexp = '\v(\=\>)|(\>,)|(\})'
+"}}}
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Functions {{{
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! imagine#TabRemap(...) abort
-  set undolevels=1000
+  call s:SetType('')
+  call s:LogMsg('-------- Start ----------')
 
-  call s:LogType('')
-
-  " Call SuperTab if the completion list is visible
-  if pumvisible()
-    call s:LogType('SuperTab Visible')
+  " Only works when <tab> mapping is not prefixed with `<c-g>u`
+  if pumvisible() && exists("*SuperTab")
+    call s:LogMsg('SuperTab popup menu is visible')
     return SuperTab('n')
   endif
 
   if a:0 > 0
-    " Set test context
-    " Order: line, column, lines
+    " Read test arguments
     let line = a:1
     let column = a:2
     let lines = a:3
@@ -32,344 +83,363 @@ function! imagine#TabRemap(...) abort
     " Read user context
     let line = getline('.')
     let column = col('.')
-    let lines = getline(1, '$')
-  endif
-  let word = s:GetWord(line, column)
-  let ret = []
-
-  call s:LogMsg('word: '.word)
-
-  " Return <tab> if is in column 1 or behind spaces
-  unlet ret
-  let ret = s:TabMatch(word, column)
-  if count([0], ret) == 0
-    return ret
   endif
 
-  " custom Direct match
-  unlet ret
-  let ret = s:DirectMatch(word, column)
-  if count([0], ret) == 0
-    return ret
+  let chars = s:GetChars(line, column)
+
+  echohl Identifier
+  call s:LogMsg('chars: '.chars)
+  echohl None
+
+  let result = []
+
+  " Return <tab> if the cursor is at col 1 or behind spaces
+  unlet result
+  let result = s:TryTab(chars, column)
+  if result isnot 0
+    return result
+  endif
+    
+  " Try custom snippet
+  unlet result
+  let result = s:TrySnippet(chars, column)
+  if result isnot 0
+    return result
   endif
 
-  " emmet match
+  " Try emmet match
   if s:loaded_emmet_vim
-    unlet ret
-    let ret = imagine_emmet#EmmetMatch(word, line)
-    if count([0], ret) == 0
-      return ret
+    unlet result
+    let result = s:TryEmmet(chars, line)
+    if result isnot 0
+      return result
     endif
   endif
 
-  " fuzzy match
-  unlet ret
-  let ret = s:FuzzyMatch(word, column, lines)
-  if count([0], ret) == 0
-    return ret
+  " Try fuzzy match
+  if a:0 < 1
+    let lines = getline(1, '$')
+  endif
+  unlet result
+  let result = s:TryFuzzy(chars, column, lines)
+  if result isnot 0
+    return result
   endif
 
   " SuperTab match
-  unlet ret
-  let ret = s:SuperTabMatch()
-  if count([0], ret) == 0
-    return ret
+  unlet result
+  let result = s:SuperTabMatch()
+  if count([0], result) == 0
+    return result
   endif
 
+  call s:LogMsg('-------- Not matched ----------')
   return ''
 endfunc
 
-" Add word under cursor to prior words
-function! imagine#AddPriorWords() abort
-  normal! viw"zy
-  let word = @z
-  if count(g:imagine_prior_words, word) == 0
-    call add(g:imagine_prior_words, word)
+" Move cursor for snippet match
+function! imagine#Move()
+  if s:type == 'Snippet' && count(s:snippet_result, '|')
+    call search('|', 'b', line("w0"))
+    return "\<del>"
+  else
+    return ''
   endif
-
-  echo '['.s:name.'] Prior words: '
-  echo g:imagine_prior_words
 endfunction
 
-" Get the word to complete
-function! s:GetWord(line, column) abort
+function! imagine#ToggleEmmet() abort
+  call s:InitUseEmmetVariable()
+  let b:vim_imagine_use_emmet = 1 - b:vim_imagine_use_emmet
+  if b:vim_imagine_use_emmet == 1
+    echom '['.s:name.'] Use emmet'
+  else
+    echom '['.s:name.'] Not use emmet'
+  endif
+endfunction
+
+" Add chars under cursor to favoured words
+function! imagine#AddFavouredWord() abort
+  let word = expand('<cwrod>')
+  if count(g:vim_imagine_fuzzy_favoured_words, word) == 0
+    call add(g:vim_imagine_fuzzy_favoured_words, word)
+  endif
+
+  echo '['.s:name.'] Fuzzy favoured words: '
+        \.join(g:vim_imagine_fuzzy_favoured_words, ', ')
+endfunction
+
+" Get the chars to complete
+function! s:GetChars(line, column) abort
   let line = a:line
   let end = a:column - 2
   let start = end - 1
 
-  let match = '\v[0-9A-Za-z\-\$_]'
+  if line[end] !~ s:leader_char_regexp
+    return ''
+  endif
 
-  while line[start] =~ match
+  while line[start] =~ s:chars_regexp
     let start -= 1
   endwhile
 
-  let word = line[start+1 : end]
-  return word
+  let chars = line[start + 1 : end]
+  return chars
 endfunction
 
-" Set complete type
-function! s:LogType(type) abort
+" Set match type
+function! s:SetType(type) abort
   if a:type != ''
     call s:LogMsg('Type: '.a:type)
+    if a:type == 'Fuzzy'
+      call s:LogMsg('-------- End with '.a:type.', '.s:fuzzy_method.' ----------')
+    else
+      call s:LogMsg('-------- End with '.a:type.' ----------')
+    endif
   endif
+
+  let s:type = a:type
 endfunction
 
-function! s:TabMatch(word, column) abort
-  let column = a:column
-  let word = a:word
-
-  if column == 1 || word == '' || word =~ '\v\s+'
-    call s:LogType('Tab')
+function! s:TryTab(chars, column) abort
+  if a:chars == '' ||  a:chars =~ '\v\s+' || a:column == 1 
+    call s:SetType('Tab')
     return "\<tab>"
   endif
 endfunction
 
-function! s:PriorMatch(word) abort
-  let word = a:word
-  let regexp = escape(word, '()@$')
-  let regexp = join(split(regexp, '\zs'), '[a-zA-Z-_]*')
-  let regexp = '\v^'.regexp
+function! s:TryFavoured(chars) abort
+  if len(g:vim_imagine_fuzzy_favoured_words) > 0
+    let chars = a:chars
+    let regexp = escape(chars, '()@$')
+    let regexp = join(split(regexp, '\zs'), '[a-zA-Z-_]*')
+    let regexp = '\v^'.regexp
 
-  let words = copy(g:imagine_prior_words)
-  let ret = filter(words, 'v:val =~ '''.regexp.'''')
-  let ret = sort(ret, "s:LengthDecrement")
-  let ret = s:RemoveDumplicateElem(ret, word)
+    let words = copy(g:vim_imagine_fuzzy_favoured_words)
+    let result = filter(words, 'v:val =~ '''.regexp.'''')
+    let result = sort(result, "s:LengthDecrement")
+    let result = s:RemoveDumplicate(result, chars)
 
-  call s:LogMsg('== Prior')
-  call s:LogMsg('== '.regexp)
-  return ret
+    call s:LogMsg('Method: Favour')
+    call s:LogMsg('Regexp: '.regexp)
+    let s:fuzzy_method = 'Favour'
+    return result
+  else
+    return []
+  endif
 endfunction
 
-" Function: Compare input word with g:dict/g:dict_end/g:dict_end2
-" defined in config/imagine.vim
-function! s:DirectMatch(word, column) abort
-  " Load config when filetype is changed
+function! s:TrySnippet(chars, column) abort
+  " Reload setting if filetype is changed
   if &filetype !=? s:filetype
     let s:filetype = &filetype
-    runtime imagine_config.vim
+    call s:LogMsg('Filetype changed, reload '.s:snippets_path)
+    execute 'runtime '.s:snippets_path
+
+    if !filereadable(s:snippets_path)
+      call s:LogMsg('Load setting in '.s:snippets_path_example, 'warning')
+      call s:LogMsg('Please save '.s:snippets_path_example.' as '.s:snippets_path
+            \.', then add custom snippets in it', 'warning')
+      execute 'runtime '.s:snippets_path_example
+    endif
   endif
 
-  let column = a:column
-  let word = a:word
-  let length = len(word)
+  let dict = exists("g:vim_imagine_test_dict")
+        \ ? g:vim_imagine_test_dict
+        \ : g:vim_imagine_dict
+  let dict_1 = g:vim_imagine_dict_1
+  let dict_2 = g:vim_imagine_dict_2
 
-  if !exists("g:vim_imagine_dict_end")
-    call s:LogMsg('Please save config/example.vim to config/imagine.vim, add custome configs in it later', 'warning')
-    call s:LogMsg('Load config in config/example.vim', 'warning')
-    runtime config/example.vim
-  endif
-  let dict = g:vim_imagine_dict
-  let dict_end = g:vim_imagine_dict_end
-  let dict_end2 = g:vim_imagine_dict_end2
-  if exists("g:vim_imagine_test_dict")
-    let dict = g:vim_imagine_test_dict
-  endif
-
-  let res = get(dict, word, [])
-  if res == []
-    let res = get(dict_end, word[-1:-1], [])
-    if res != []
+  let length = len(a:chars)
+  let default = ''
+  let result = get(dict, a:chars, default)
+  if result == default
+    let result = get(dict_1, a:chars[-1:-1], default)
+    if result != default
       let length = 1
     elseif length > 1
-      let res = get(dict_end2, word[-2:-1], [])
-      if res != []
+      let result = get(dict_2, a:chars[-2:-1], default)
+      if result != default
         let length = 2
       endif
     endif
   endif
 
-  if res != []
-    call s:LogType('Direct')
-    let [new_word, flag] = res
-    if flag == '$'
-      " For '$', return new_word as it is
-      return new_word
+  if result != default
+    call s:SetType('Snippet')
+    let s:snippet_result = result
+    if mode() == 'i'
+      let deletes = "\<bs>"
+      while length > 1
+        let deletes = deletes."\<bs>"
+        let length = length - 1
+      endwhile
+
+      return deletes.result
     else
-      " Else, complete the word with new_word
-      if mode() == 'i'
-        call complete(column - length, [new_word])
-        return s:MoveAfterDirectComplete(flag)
-      else
-        call s:LogMsg('Return: '.new_word)
-        return new_word
-      endif
+      call s:LogMsg('Return: '.result)
+      return result
     endif
+  else
+    let s:snippet_result = ''
   endif
 endfunction
 
-function! s:FuzzyMatch(word, column, lines) abort
-  let column = a:column
-  let word = a:word
-  let length = len(word)
+function! s:TryFuzzy(chars, column, lines) abort
+  let length = len(a:chars)
 
-  if (length > 1 && length < s:max_length)
-    let ret = FuzzyMatchChain(word, a:lines)
+  if (length > 1 && length < s:fuzzy_chars_max_length)
+    let result = TryFuzzyChain(a:chars, a:lines)
 
-    if !s:InvalidRet(ret, word)
-      call s:LogType('Fuzzy')
+    if !s:InvalidRet(result, a:chars)
+      let result_word = result[0]
+      call s:SetType('Fuzzy')
       if mode() == 'i'
-        call complete(column - length, [ret[0]])
+        call complete(a:column - length, [result_word])
         return ''
       else
-        call s:LogMsg('Return: '.ret[0])
-        return ret[0]
+        call s:LogMsg('Return: '.result_word)
+        return result_word
       endif
     endif
   endif
 endfunction
 
-function! s:InvalidRet(ret, word) abort
-  return a:ret == [] || a:ret == [a:word]
+function! s:InvalidRet(result, chars) abort
+  return a:result == [] || a:result == [a:chars]
 endfunction
 
-function! s:CleanRet(ret, word) abort
-  let ret = a:ret
-  let word = a:word
+function! s:CleanRet(result, chars) abort
+  let result = map(a:result, "s:RemoveLeaderSpaces(".'v:val'.")")
 
-  function! RemoveLeaderSpaces(val) abort
-    return substitute(a:val, '\v^\s*', '', 'g')
-  endfunction
-  let ret = map(ret, "RemoveLeaderSpaces(".'v:val'.")")
-
-  if ret == [word]
-    call remove(ret, 0)
+  if result == [a:chars]
+    return []
+  else
+    return result
   endif
-  return ret
 endfunction
 
-function! FuzzyMatchChain(word, lines) abort
-  call s:LogMsg('In Fuzzy')
-  let word = a:word
-  let lines = a:lines
-  let ret = []
+function! s:RemoveLeaderSpaces(val) abort
+  return substitute(a:val, '\v^\s+', '', '')
+endfunction
 
-  let matchchain = g:vim_imagine_matchchain
-  call s:LogMsg(matchchain)
-  let ret = s:PriorMatch(word)
-  for method in matchchain
-    if s:InvalidRet(ret, word)
-      let ret = s:FuzzyMatchMethod(method, word, lines)
+function! TryFuzzyChain(chars, lines) abort
+  let chars = escape(a:chars, '()@$')
+
+  let s:fuzzy_method = ''
+  call s:LogMsg('Try fuzzy')
+  call s:LogMsg('Fuzzy chain: '.join(s:fuzzy_chain, ', '))
+
+  let result = s:TryFavoured(chars)
+  for method in s:fuzzy_chain
+    if s:InvalidRet(result, chars)
+      let result = s:CallFuzzyMethod(method, chars, a:lines)
     endif
   endfor
 
-  let ret = s:CleanRet(ret, word)
-  return ret
+  let result = s:CleanRet(result, chars)
+  return result
 endfunction
 
-function! s:FuzzyMatchMethod(method, word, lines) abort
-  let lines = a:lines
+function! s:CallFuzzyMethod(method, chars, lines) abort
   let method = a:method
-  let ret = []
-  let word = escape(a:word, '()@$')
 
-  " Get fuzzy_dict
-  if has_key(s:fuzzy_dict, method)
-    let fuzzy_dict = s:fuzzy_dict
-  elseif exists('g:vim_imagine_custom_fuzzy_dict') 
-        \&& has_key(g:vim_imagine_custom_fuzzy_dict, method)
-    let fuzzy_dict = g:vim_imagine_custom_fuzzy_dict
+  " Get fuzzy_methods
+  if has_key(s:fuzzy_methods, method)
+    let fuzzy_methods = s:fuzzy_methods
+  elseif has_key(s:fuzzy_custom_methods, method)
+    let fuzzy_methods = s:fuzzy_custom_methods
   else
-    call s:LogMsg('Warning: '.method.' not found on fuzzy_dict'
-          \, 'warning')
-    return ret
+    call s:LogMsg('Warning: '
+          \.'chain method '.method.' was not found', 'warning')
+    return []
   endif
 
   " Get regexp
-  let regexp = fuzzy_dict[method](word)
+  let regexp = fuzzy_methods[method](a:chars)
   if regexp == ''
-    call s:LogMsg('Method: '.method)
-    call s:LogMsg('Result: no regexp returned')
-    return ret
+    call s:LogMsg('Method: '.method, 'warning')
+    call s:LogMsg('Regexp: no regexp is returned', 'warning')
+    return []
   endif
 
   " Get splits
-  if has_key(fuzzy_dict, method.'_splits')
-    let splits = fuzzy_dict[method.'_splits']()
+  if has_key(fuzzy_methods, method.'_splits')
+    let splits = fuzzy_methods[method.'_splits'](s:splits)
+    let splits_regexp = s:GetSplitsRegExp(splits)
   else
-    let splits = s:splits
+    let splits_regexp = s:GetSplitsRegExp(s:splits)
   endif
 
   " Get match words
-  for l in lines
-    let words = split(l, splits)
-    let match_words =
-          \ filter(words, 'v:val =~ '''.regexp.'''')
-    let ret = ret + match_words
+  let result = []
+  for l in a:lines
+    let words = split(l, splits_regexp)
+    let matchs = filter(words, 'v:val =~ '''.regexp.'''')
+    let result = result + matchs
   endfor
 
-  " Return
-  let ret = sort(ret, "s:LengthDecrement")
-  let ret = s:RemoveDumplicateElem(ret, word)
+  " Log
   call s:LogMsg('Method: '.method)
   call s:LogMsg('Regexp: '.regexp)
-  return ret
+  let s:fuzzy_method = method
+
+  " Return
+  let result = sort(result, "s:LengthDecrement")
+  let result = s:RemoveDumplicate(result, a:chars)
+  return result
 endfunction
 
-function! s:fuzzy_dict.hyphen(word)
-  let regexp = join(split(a:word, '\zs'), '\w*(-)')
-  let regexp = '\v^\@?'.regexp.'\w*>'
+function! s:GetSplitsRegExp(splits)
+  let splits = substitute(a:splits, ',\+', ',', 'g')
+  " Escape every char
+  let escaped_splits = substitute(splits, '\([^,]\)', '\\\1', 'g')
+  let splits_regexp = '\v(\s|,|' . join(split(escaped_splits, ','), '|') . ')'
+  return splits_regexp
+endfunction
+
+function! s:fuzzy_methods.hyphen(chars)
+  let regexp = join(split(a:chars, '\zs'), '[^-]*-')
+  let regexp = '\v^(\@|\$)?'.regexp.'\w*>'
   return regexp
 endfunction
 
-function! s:fuzzy_dict.capital(word)
-  let regexp = substitute(a:word, '\v.\zs\w*', '\U\0', 'g')
+function! s:fuzzy_methods.capital(chars)
+  let regexp = substitute(a:chars, '\v.\zs\w+', '\U\0', 'g')
   let regexp = join(split(regexp, '\zs'), '\l*')
   let regexp = '['.regexp[0].toupper(regexp[0]).']'.
         \ regexp[1:]
-  let regexp = '\v\C^'.regexp.'\l*>'
+  let regexp = '\v\C^(\@|\$)?'.regexp.'\l*>'
   return regexp
 endfunction
 
-function! s:fuzzy_dict.dot(word)
-  let regexp = join(split(a:word, '\zs'), '[^.]*\.')
-  let regexp = '\v^\@?'.regexp.'[^.]*>'
+function! s:fuzzy_methods.dot(chars)
+  let regexp = join(split(a:chars, '\zs'), '[^.]*\.')
+  let regexp = '\v^(\@|\$)?'.regexp.'[^.]*>'
   return regexp
 endfunction
 
-function! s:fuzzy_dict.dot_splits()
-  return '\v(\s|\(|\)|\{|\}|\=|\:|\''|\"|,|;|\<|\>|\[|\]|\/|\\|\+|\!|#|*|`)'
+function! s:fuzzy_methods.dot_splits(splits)
+  return substitute(a:splits, '\.' , '', 'g')
 endfunction
 
-function! s:fuzzy_dict.underscore(word)
-  let regexp = join(split(a:word, '\zs'), '[^_]*_')
-  let regexp = '\v^'.regexp.'[^_]*>'
+function! s:fuzzy_methods.underscore(chars)
+  let regexp = join(split(a:chars, '\zs'), '[^_]*_')
+  let regexp = '\v^(\@|\$)?'.regexp.'[^_]*>'
   return regexp
 endfunction
 
-function! s:fuzzy_dict.chars(word)
-  let regexp = join(split(a:word, '\zs'), '.*')
+function! s:fuzzy_methods.include(chars)
+  let regexp = join(split(a:chars, '\zs'), '.*')
   let regexp = '\v<.*'.regexp.'.*>'
   return regexp
 endfunction
 
 function! s:SuperTabMatch() abort
   if exists("*SuperTab")
-    call s:LogType('SuperTab')
+    call s:SetType('SuperTab')
     return SuperTab('n')
   endif
 endfunction
-
-function! s:MoveAfterDirectComplete(action) abort
-  let action = a:action
-  let ret = ''
-
-  if action != '' && len(action) % 2 == 0
-    let i = 0
-    let l = len(action)
-
-    while i < l
-      let times = action[i+0]
-      let action = action[i+1]
-
-      for j in range(times)
-        let ret = ret . s:action_dict[action]
-      endfor
-      let i += 2
-    endwhile
-  endif
-
-  return ret
-endfunc
 
 function! s:LengthDecrement(i1, i2) abort
   return len(a:i2) - len(a:i1)
@@ -382,10 +452,8 @@ endfunction
 function! s:LogMsg(msg, ...) abort
   if exists("g:vim_imagine_debug")
         \ && g:vim_imagine_debug == 1
-    if type(a:msg) == 3
-      for i in a:msg
-        echom '== List item: '.i
-      endfor
+    if type(a:msg) == 3 "List
+      echom '['.s:name.'] '. join(a:msg, ', ')
     else
       if a:0 == 1 && a:1 == 'warning'
         echohl WarningMsg
@@ -398,14 +466,13 @@ function! s:LogMsg(msg, ...) abort
   endif
 endfunction
 
-
-function! s:RemoveDumplicateElem(list, word) abort
+function! s:RemoveDumplicate(list, exclude_word) abort
   let old_list = a:list
   let new_list = []
   let i = 0
 
   for item in old_list
-    if (i == 0 || count(new_list, item) == 0) && item != a:word
+    if (i == 0 || count(new_list, item) == 0) && item != a:exclude_word
       call add(new_list, item)
       let i += 1
     endif
@@ -413,3 +480,38 @@ function! s:RemoveDumplicateElem(list, word) abort
 
   return new_list
 endfunction
+
+function! s:InitUseEmmetVariable()
+  let b:vim_imagine_use_emmet = exists('b:vim_imagine_use_emmet') 
+        \ ? b:vim_imagine_use_emmet
+        \ : 0
+endfunction
+
+" Try emmet match
+function! s:TryEmmet(chars, line) abort
+  call s:InitUseEmmetVariable()
+  let length = len(a:chars)
+
+  " Enable when length is 1 or b:vim_imagine_use_emmet is 1
+  let enable = length == 1 
+        \|| b:vim_imagine_use_emmet == 1
+
+  if enable
+    call s:SetType('Emmet')
+
+    " emmet#expandAbbr(mode, abbr) range abort
+    " ...
+    " if a:mode ==# 1
+    "   let part = matchstr(line, '\([a-zA-Z0-9:_\-\@|]\+\)$')
+    " else
+    "   let part = matchstr(line, '\(\S.*\)$')
+    " ...
+    if a:line =~ s:emmet_special_line_regexp
+      return emmet#expandAbbr(1, '')
+    else
+      return emmet#expandAbbr(0, '')
+    endif 
+  endif
+endfunction
+
+"vim: fdm=marker 
