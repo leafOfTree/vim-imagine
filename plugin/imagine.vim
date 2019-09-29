@@ -30,7 +30,7 @@ let s:mapping_add_favoured_word = s:GetConfig('g:vim_imagine_mapping_add_favoure
 " Mappings {{{
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-inoremap <c-u> <c-g>u<Esc>ua
+inoremap <c-u> <c-r>=imagine#Undo()<cr>
 inoremap <c-f> <esc>:call imagine#ToggleEmmet()<cr>a
 noremap <leader>a :call imagine#AddFavouredWord()<cr>
 

@@ -168,6 +168,11 @@ function! imagine#AddFavouredWord() abort
         \.join(g:vim_imagine_fuzzy_favoured_words, ', ')
 endfunction
 
+function! imagine#Undo()
+  undo
+  return ''
+endfunction
+
 " Get the chars to complete
 function! s:GetChars(line, column) abort
   let line = a:line
