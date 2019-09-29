@@ -15,7 +15,7 @@ It wil try to return the most possible word based on current context. Choosing a
 ===========================================================================
 2. Usage                                        *Usage*
 
-In INSERT mode, press <kbd>tab</kbd> to complete the word, press <kbd>c-u</kbd> to undo the completion.
+In INSERT mode, press <kbd>tab</kbd> to complete the word. Press <kbd>c-u</kbd> to undo the completion.
 
 ===========================================================================
 3. Documentation                                *Documentation*
