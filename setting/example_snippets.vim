@@ -16,10 +16,10 @@ let dict_base = {}
 " Only check the last character
 let dict_1 = {}
 let dict_1_base = {
-        \'{': "{\<cr>\<esc>O",
-        \'(': "(\<cr>\<esc>O", 
-        \'`': "`\<cr>\<esc>O", 
-        \'>': ">\<cr>\<esc>O", 
+        \'{': "{\r\eO",
+        \'(': "(\r\eO", 
+        \'`': "`\r\eO", 
+        \'>': ">\r\eO", 
         \'<': "< />", 
         \}
 
@@ -31,7 +31,7 @@ if (&filetype == 'html'  || &filetype == 'xml' || &filetype == '')
         \'d'    : '$', 
         \'e'    : '{{}}', 
         \'r'    : 'return ',     
-        \'f'    : "function (|) {\<cr>}", 
+        \'f'    : "function (|) {\r}", 
         \'cl'   : "console.log(|);", 
         \'al'    : "alert(|)",
         \'\sp'  : '&nbsp;', 
@@ -51,7 +51,7 @@ elseif &filetype == 'vim'
   let dict = {
         \'r'    : 'return ', 
         \'f'    : "function! (|)\rendfunction", 
-        \'l'    : "for | in \<cr>endfor",
+        \'l'    : "for | in \rendfor",
         \'aug'  : "augroup test\rautocmd!\rautocmd |\raugroup end", 
         \}
 
@@ -102,8 +102,8 @@ elseif (&filetype == 'javascript.jsx'
         \'push' : "Array.prototype.push.apply()",
         \'gebi' : "document.getElementById('')", 
         \'gebt' : "getElementsByTagName('')0]", 
-        \'f'    : "function (|) {\<cr>}", 
-        \'g'    : "function* (|) {\<cr>}", 
+        \'f'    : "function (|) {\r}", 
+        \'g'    : "function* (|) {\r}", 
         \'F'    : "function (|) {  }",
         \'a'    : "(|) => {}", 
         \'s'    : "| => ", 
@@ -117,11 +117,11 @@ elseif (&filetype == 'javascript.jsx'
 
   if s:use_react
     let dict_react = {
-          \'ir'   : "import React from 'react';\<cr>",
+          \'ir'   : "import React from 'react';\r",
           \'is'   : "import './index.less';",
           \'rc'   : "React.Component {|}",
           \'rr'   : "ReactDOM.render(<| />)",
-          \'tpd'  : "this.props.dispatch({\<cr>type: '|',\<cr>payload: {},\<cr>})"
+          \'tpd'  : "this.props.dispatch({\rtype: '|',\rpayload: {},\r})"
           \}
     call extend(dict, dict_react)
   endif
