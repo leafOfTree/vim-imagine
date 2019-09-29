@@ -172,7 +172,7 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
 
 #### b:vim_imagine_use_emmet <a name="use_emmet"></a>
 
-- description: Enable emmet method.
+- description: Enable emmet method at first. It can be togggled by <kbd>c-f</kbd>.
 - type: 'int' (0 or 1)
 - default: 0
 - example:
@@ -185,7 +185,7 @@ autocmd FileType html,pug,xml,css,less let b:vim_imagine_use_emmet = 1
 
 #### INSERT mode
 
-- <kbd>tab</kbd>: complete the chars before the cursor
+- <kbd>tab</kbd>: complete the chars before the cursor.
 
 - <kbd>c-u</kbd>: undo the completion. 
 
@@ -193,7 +193,7 @@ autocmd FileType html,pug,xml,css,less let b:vim_imagine_use_emmet = 1
     let g:vim_imagine_mapping_undo_completion = '<c-u>'
     ```
 
-- <kbd>c-f</kbd>: toggle emmet
+- <kbd>c-f</kbd>: toggle emmet.
 
     ```vim
     let g:vim_imagine_mapping_toggle_emmet = '<c-f>'
@@ -201,7 +201,7 @@ autocmd FileType html,pug,xml,css,less let b:vim_imagine_use_emmet = 1
 
 #### NORMAL mode
 
-- <kbd>leader</kbd> <kbd>a</kbd>: add the word under the cursor to favoured words <a name="add_favoured_word"></a>
+- <kbd>leader</kbd> <kbd>a</kbd>: add the word under the cursor to favoured words <a name="add_favoured_word"></a>.
 
     ```vim
     let g:vim_imagine_mapping_add_favoured_word = '<leader>a'
