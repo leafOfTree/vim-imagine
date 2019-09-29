@@ -1,20 +1,18 @@
 # vim-imagine
 
-A simple context-based vim compeletion plugin. 
+A simple context-based vim completion plugin. It wil try to return the most possible word based on current context. Choosing a word from the menu should be avoided.
 
-It wil try to return the most possible word based on current context. Choosing a word from the menu should be avoided.
+**Supports**
 
-Supports
-
-- Literial <kbd>tab</kbd>
-- Custom snippets.
+- Literial <kbd>tab</kbd>.
+- [Custom snippets](#custom_snippets).
 - [Extensible fuzzy match](#fuzzy_match).
 - [emmet-vim][0].
 - [supertab][1].
 
 ## Usage
 
-In INSERT mode, press <kbd>tab</kbd> to complete the word, press <kbd>c-u</kbd> to undo the completion.
+In INSERT mode, press <kbd>tab</kbd> to complete the word. Press <kbd>c-u</kbd> to undo the completion.
 
 ## Install
 
@@ -28,11 +26,11 @@ In INSERT mode, press <kbd>tab</kbd> to complete the word, press <kbd>c-u</kbd> 
 
 ## How it works
 
-vim-imagine tries these methods in order to find out the completion word.
+It tries these methods in order to find out the completion word.
 
 - Literial <kbd>tab</kbd>.
-- Custom snippets.
-- Extensible fuzzy match.
+- [Custom snippets](#custom_snippets).
+- [Extensible fuzzy match](#fuzzy_match).
 - [emmet-vim][0].
 - [supertab][1].
 
@@ -40,9 +38,9 @@ vim-imagine tries these methods in order to find out the completion word.
 
 It will return literial <kbd>tab</kbd> if there are blanks or the start of line before the cursor.
 
-### Custom snippets
+### Custom snippets <a name="custom_snippets"></a>
 
-It will return the snippet if the characters before the cursor match the key in the dictionary.
+It will return the snippet if the characters before the cursor match the key in the dictionary defined by [snippets file](#snippets).
 
 ### Extensible fuzzy search <a name="fuzzy_match"></a>
 
@@ -75,23 +73,23 @@ It will return the first match that fuzzy methods find in current file. The long
 
 #### Custom methods 
 
-All methods defined in `g:vim_imagine_fuzzy_custom_methods` are used in fuzzy completion. See [example](#custom_methods_eample).
+All methods defined in [g:vim_imagine_fuzzy_custom_methods](#fuzzy_custom_methods) are used in fuzzy completion. See the [example](#custom_methods_eample).
 
 ### Emmet
 
-It will return [emmet-vim][0]'s result when there is only one character before the cursor or `b:vim_imagine_use_emmet` is 1. This happends only if it's installed.
+It will return [emmet-vim][0]'s result if it's installed when there is only one character before the cursor or [b:vim_imagine_use_emmet](#use_emmet) is 1.
 
 ### Supertab
 
-It will return [supertab][1]'s result if it's installed. It's worth nothing that <kbd>tab</kbd> can't be used to move in popup menu, but <kbd>up</kbd>, <kbd>down</kbd>, <kbd>enter</kbd> still work
+It will return [supertab][1]'s result if it's installed. It's worth nothing that <kbd>tab</kbd> can't be used to move in popup menu, but <kbd>up</kbd>, <kbd>down</kbd>, <kbd>enter</kbd> still work.
 
 ## Configuration
 
 ### Variables
 
-`g:vim_imagine_snippets_path`
+#### g:vim_imagine_snippets_path <a name="snippets"></a>
 
-- description: the path of the snippets file under the `runtimepath`.
+- description: the path of the snippets file under the `runtimepath`. See [the example snippets](/setting/example_snippets.vim)
 - type: `string`.
 - default: `'plugin/imagine_snippets.vim'`. 
 
@@ -101,7 +99,7 @@ It's recommended to put it in `.vim` or `vimfiles`. The only requirement is that
 `g:vim_imagine_dict_2`
 are defined as expected. If the path is not readable, [the example snippets](/setting/example_snippets.vim) will be used.
 
-`g:vim_imagine_fuzzy_chain` 
+#### g:vim_imagine_fuzzy_chain
 
 - description: the order of methods that fuzzy search uses.
 - type: `list`.
@@ -117,7 +115,7 @@ are defined as expected. If the path is not readable, [the example snippets](/se
         \]
     ```
 
-`g:vim_imagine_fuzzy_custom_methods`
+#### g:vim_imagine_fuzzy_custom_methods <a name="fuzzy_custom_methods"></a>
 
 - description: defines custom methods that fuzzy search uses.
 - type: `dictionary`.
@@ -130,7 +128,7 @@ are defined as expected. If the path is not readable, [the example snippets](/se
         
 
 - default: `{}`
-- <a name="custom_methods_eample"></a>example: 
+- example:<a name="custom_methods_eample"></a> 
 
     ```vim
     let g:vim_imagine_fuzzy_custom_methods = {}
@@ -156,11 +154,22 @@ are defined as expected. If the path is not readable, [the example snippets](/se
         \]
     ```
 
-`g:vim_imagine_fuzzy_favoured_words`
+#### g:vim_imagine_fuzzy_favoured_words
 
 - description: The words to check firstly when fuzzy search starts. The list can also be changed while editing files by <kbd>leader</kbd> <kbd>a</kbd> in NORMAL mode.
 - type: `list`.
 - default: `[]`
+
+#### b:vim_imagine_use_emmet <a name="use_emmet"></a>
+
+- description: Enable emmet method.
+- type: 'int' (0 or 1)
+- default: 0
+- example:
+
+```vim
+autocmd FileType html,pug,xml,css,less let b:vim_imagine_use_emmet = 1
+```
 
 ### Mappings
 
