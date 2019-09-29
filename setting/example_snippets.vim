@@ -2,7 +2,7 @@
 " Setting exmpale file
 " 
 " Note:
-" Save this file as 'plugin/imagine_snippets.vim' under the 'runtimepath'. 
+" It's recommended to save this file as 'plugin/imagine_snippets.vim' under the 'runtimepath'. 
 " Then add your custome snippets in it.
 " 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -70,7 +70,7 @@ elseif &filetype == 'vim'
         \'F'    : ' ! ' ,
         \'B'    : ' != ' ,
         \}
-elseif if (&filetype == 'javascript.jsx' 
+elseif (&filetype == 'javascript.jsx' 
       \|| &filetype == 'vue' 
       \|| &filetype == 'svelte' 
       \|| &filetype == 'javascript.typescript')
