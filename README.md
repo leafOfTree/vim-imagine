@@ -93,11 +93,21 @@ It will return [supertab][1]'s result if it's installed. It's worth nothing that
 - type: `string`.
 - default: `'plugin/imagine_snippets.vim'`. 
 
-It's recommended to put it in `.vim` or `vimfiles`. The only requirement is that these variables 
+It's recommended to put it under `.vim` or `vimfiles`. It's a normal vimscript file. The only requirement is that these dictionary variables 
 `g:vim_imagine_dict`,
 `g:vim_imagine_dict_1`,
 `g:vim_imagine_dict_2`
 are defined as expected. If the path is not readable, [the example snippets](/setting/example_snippets.vim) will be used.
+
+#### Snippets file format
+For dictionary variable
+`g:vim_imagine_dict`,
+`g:vim_imagine_dict_1`,
+`g:vim_imagine_dict_2`, the key is the chars before the cursor, and the value is the snippet string. 
+
+Special characters like `\r`, `\t`, `\e` are supported in double quoted string(see `:h string`). Normal mode commands can be executed after `\e`.
+
+`|` can be used to mark cursor location. 
 
 #### g:vim_imagine_fuzzy_chain
 

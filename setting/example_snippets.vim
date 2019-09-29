@@ -17,7 +17,7 @@ let dict_base = {}
 let dict_1 = {}
 let dict_1_base = {
         \'{': "{\r\eO",
-        \'(': "(\r\eO", 
+        \'(': "(\r|\r", 
         \'`': "`\r\eO", 
         \'>': ">\r\eO", 
         \'<': "< />", 
