@@ -43,8 +43,8 @@ let b:vim_imagine_use_emmet = s:GetConfig('b:vim_imagine_use_emmet', 0)
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let s:name = 'vim-imagine'
-let s:leader_char_regexp = '\v[0-9A-Za-z-$_{(<>`]'
-let s:chars_regexp = '\v[0-9A-Za-z-$_\\]'
+let s:leading_char_regexp = '\v[0-9A-Za-z$_\-{(<>`]'
+let s:chars_regexp = '\v[0-9A-Za-z$_\-\\]'
 
 " Space and comma are added by default
 let s:splits = '(,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.' 
@@ -174,7 +174,7 @@ function! s:GetChars(line, column) abort
   let end = a:column - 2
   let start = end - 1
 
-  if line[end] !~ s:leader_char_regexp
+  if line[end] !~ s:leading_char_regexp
     return ''
   endif
 
@@ -233,9 +233,10 @@ function! s:TrySnippet(chars, column) abort
   if &filetype !=? s:filetype
     let s:filetype = &filetype
     call s:LogMsg('Filetype changed, reload '.s:snippets_path)
+    let g:vim_imagine_dict = 0
     execute 'runtime '.s:snippets_path
 
-    if !filereadable(s:snippets_path)
+    if g:vim_imagine_dict is 0
       call s:LogMsg('Load setting in '.s:snippets_path_example, 'warning')
       call s:LogMsg('Please save '.s:snippets_path_example.' as '.s:snippets_path
             \.', then add custom snippets in it', 'warning')
