@@ -127,8 +127,8 @@ elseif (&filetype == 'javascript.jsx'
   endif
 
   let dict_1 = {
-        \'V'    : '={}',
-        \'L'    : '=""',
+        \'V'    : '={|}',
+        \'L'    : '="|"',
         \'M'    : "(|) {\r}",
         \'E'    : " === ", 
         \'A'    : ' && ', 
