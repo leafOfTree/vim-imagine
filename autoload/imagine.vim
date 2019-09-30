@@ -43,7 +43,7 @@ let b:vim_imagine_use_emmet = s:GetConfig('b:vim_imagine_use_emmet', 0)
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let s:name = 'vim-imagine'
-let s:leading_char_regexp = '\v[0-9A-Za-z$_\-{(<>`]'
+let s:leading_char_regexp = '\v[0-9A-Za-z$_\-{[(<>`]'
 let s:chars_regexp = '\v[0-9A-Za-z$_\-\\]'
 
 " Space and comma are added by default
@@ -155,6 +155,7 @@ function! imagine#ToggleEmmet() abort
   else
     echom '['.s:name.'] Not use emmet'
   endif
+  return ''
 endfunction
 
 " Add chars under cursor to favoured words

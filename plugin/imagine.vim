@@ -31,7 +31,7 @@ let s:mapping_add_favoured_word = s:GetConfig('g:vim_imagine_mapping_add_favoure
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 inoremap <c-u> <c-r>=imagine#Undo()<cr>
-inoremap <c-f> <esc>:call imagine#ToggleEmmet()<cr>a
+inoremap <c-f> <c-r>=imagine#ToggleEmmet()<cr>
 noremap <leader>a :call imagine#AddFavouredWord()<cr>
 
 " Can undo completion, but can't traverse the popup menu with <tab>
