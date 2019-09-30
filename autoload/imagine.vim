@@ -159,7 +159,7 @@ endfunction
 
 " Add chars under cursor to favoured words
 function! imagine#AddFavouredWord() abort
-  let word = expand('<cwrod>')
+  let word = expand("<cword>")
   if count(g:vim_imagine_fuzzy_favoured_words, word) == 0
     call add(g:vim_imagine_fuzzy_favoured_words, word)
   endif
