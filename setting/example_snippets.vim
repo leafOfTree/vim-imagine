@@ -20,7 +20,7 @@ let dict_1_base = {
         \'(': "(\r|\r", 
         \'`': "`\r\eO", 
         \'>': ">\r\eO", 
-        \'<': "< />", 
+        \'<': "<| />", 
         \}
 
 " Only check last two characters
