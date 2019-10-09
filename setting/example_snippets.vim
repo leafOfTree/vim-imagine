@@ -100,7 +100,7 @@ elseif (&filetype == 'javascript.jsx'
         \'cl'   : "console.log(|);", 
         \'type' : "Object.prototype.toString.call(|) === 'object'", 
         \'push' : "Array.prototype.push.apply(|)",
-        \'gebi' : "document.getElementById('|')", 
+        \'gebi' : "getElementById('|')", 
         \'gebt' : "getElementsByTagName('|')", 
         \'f'    : "function (|) {\r}", 
         \'g'    : "function* (|) {\r}", 
