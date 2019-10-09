@@ -216,8 +216,9 @@ endfunction
 function! s:TryFavoured(chars) abort
   if len(g:vim_imagine_fuzzy_favoured_words) > 0
     let chars = a:chars
-    let regexp = escape(chars, '()@$')
+    let regexp = chars
     let regexp = join(split(regexp, '\zs'), '[a-zA-Z-_]*')
+    let regexp = escape(regexp, '()@$')
     let regexp = '\v^'.regexp
 
     let words = copy(g:vim_imagine_fuzzy_favoured_words)
@@ -406,6 +407,7 @@ endfunction
 
 function! s:fuzzy_methods.hyphen(chars)
   let regexp = join(split(a:chars, '\zs'), '[^-]*-')
+  let regexp = escape(regexp, '()@$')
   let regexp = '\v^(\@|\$)?'.regexp.'\w*>'
   return regexp
 endfunction
@@ -413,14 +415,15 @@ endfunction
 function! s:fuzzy_methods.capital(chars)
   let regexp = substitute(a:chars, '\v.\zs\w+', '\U\0', 'g')
   let regexp = join(split(regexp, '\zs'), '\l*')
-  let regexp = '['.regexp[0].toupper(regexp[0]).']'.
-        \ regexp[1:]
+  let regexp = escape(regexp, '()@$')
+  let regexp = '['.regexp[0].toupper(regexp[0]).']'.regexp[1:]
   let regexp = '\v\C^(\@|\$)?'.regexp.'\l*>'
   return regexp
 endfunction
 
 function! s:fuzzy_methods.dot(chars)
   let regexp = join(split(a:chars, '\zs'), '[^.]*\.')
+  let regexp = escape(regexp, '()@$')
   let regexp = '\v^(\@|\$)?'.regexp.'[^.]*>'
   return regexp
 endfunction
@@ -431,12 +434,14 @@ endfunction
 
 function! s:fuzzy_methods.underscore(chars)
   let regexp = join(split(a:chars, '\zs'), '[^_]*_')
+  let regexp = escape(regexp, '()@$')
   let regexp = '\v^(\@|\$)?'.regexp.'[^_]*>'
   return regexp
 endfunction
 
 function! s:fuzzy_methods.include(chars)
   let regexp = join(split(a:chars, '\zs'), '.*')
+  let regexp = escape(regexp, '()@$')
   let regexp = '\v<.*'.regexp.'.*>'
   return regexp
 endfunction

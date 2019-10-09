@@ -157,6 +157,7 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
       endif
 
       let regexp = join(split(a:chars, '\zs'), '.*')
+      let regexp = escape(regexp, '()@$')
       let regexp = '\v'.case_flag.'^(\@|\$)?'.regexp.'.*>'
       return regexp
     endfunction
