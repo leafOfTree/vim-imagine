@@ -44,9 +44,16 @@ It will return the snippet if the characters before the cursor match the key in 
 
 ### Extensible fuzzy search <a name="fuzzy_match"></a>
 
-It will return the first match that fuzzy methods find in current file. The longest will be used if there are more than one matched words.
+It will return the first match that fuzzy methods find in current file. The order can be changed by [g:vim_imagine_fuzzy_chain](#fuzzy_chain) except the `favoured` method. 
+The longest will be used if there are more than one matched words.
 
 #### Builtin methods
+
+- favoured(Always try it at first)
+
+    If [g:vim_imagine_fuzzy_favoured_words](#fuzzy_favoured_words) is `['myLongName', 'anotherLongName']`, 
+
+        mln -> myLongName
 
 - hyphen
 
@@ -109,7 +116,7 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
 
 `|` can be used to mark cursor location. 
 
-#### g:vim_imagine_fuzzy_chain
+#### g:vim_imagine_fuzzy_chain <a name="fuzzy_chain"></a>
 
 - description: the order of methods that fuzzy search uses.
 - type: `list`.
@@ -164,22 +171,22 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
         \]
     ```
 
-#### g:vim_imagine_fuzzy_favoured_words
+#### g:vim_imagine_fuzzy_favoured_words <a name="fuzzy_favoured_words"></a>
 
-- description: The words to check firstly when fuzzy search starts. The list can also be changed while editing files by <kbd>leader</kbd> <kbd>a</kbd> in NORMAL mode.
+- description: The words to check firstly when fuzzy search starts. The list can be changed while editing files by <kbd>leader</kbd> <kbd>a</kbd> in NORMAL mode.
 - type: `list`.
 - default: `[]`
 
 #### b:vim_imagine_use_emmet <a name="use_emmet"></a>
 
 - description: Enable emmet method at first. It can be togggled by <kbd>c-f</kbd>.
-- type: 'int' (0 or 1)
-- default: 0
+- type: `int` (0 or 1)
+- default: `0`
 - example:
 
-```vim
-autocmd FileType html,pug,xml,css,less let b:vim_imagine_use_emmet = 1
-```
+    ```vim
+    autocmd FileType html,pug,xml,css,less let b:vim_imagine_use_emmet = 1
+    ```
 
 ### Mappings
 
