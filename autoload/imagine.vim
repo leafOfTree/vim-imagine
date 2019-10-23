@@ -43,11 +43,11 @@ let b:vim_imagine_use_emmet = s:GetConfig('b:vim_imagine_use_emmet', 0)
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let s:name = 'vim-imagine'
-let s:leading_char_regexp = '\v[0-9A-Za-z$_\-{[(<>`]'
-let s:chars_regexp = '\v[0-9A-Za-z$_\-\\]'
+let s:first_char_regexp = '\v[0-9A-Za-z$_\-{[(<>`]'
+let s:chars_regexp = '\v[0-9A-Za-z_\-\\]'
 
 " Space and comma are added by default
-let s:splits = '(,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.' 
+let s:splits = '(,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.,->,' 
 let s:snippets_path_example = 'setting/example_snippets.vim'
 let s:fuzzy_methods = {}
 let s:fuzzy_method = ''
@@ -180,7 +180,7 @@ function! s:GetChars(line, column) abort
   let end = a:column - 2
   let start = end - 1
 
-  if line[end] !~ s:leading_char_regexp
+  if line[end] !~ s:first_char_regexp
     return ''
   endif
 
@@ -418,10 +418,10 @@ endfunction
 
 function! s:fuzzy_methods.capital(chars)
   let regexp = substitute(a:chars, '\v.\zs\w+', '\U\0', 'g')
-  let regexp = join(split(regexp, '\zs'), '\l*')
+  let regexp = join(split(regexp, '\zs'), '\U*')
   let regexp = s:EscapeRegexp(regexp)
   let regexp = '['.regexp[0].toupper(regexp[0]).']'.regexp[1:]
-  let regexp = '\v\C^(\@|\$)?'.regexp.'\l*>'
+  let regexp = '\v\C^(\@|\$)?'.regexp.'\U*>'
   return regexp
 endfunction
 
