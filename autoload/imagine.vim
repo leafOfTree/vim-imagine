@@ -24,12 +24,22 @@ let s:fuzzy_chain = s:GetConfig('g:vim_imagine_fuzzy_chain',
       \  'underscore', 
       \  'include',
       \])
+let s:fuzzy_near_chain = s:GetConfig('g:vim_imagine_fuzzy_near_chain',  
+      \[
+      \  'capital', 
+      \  'hyphen', 
+      \  'dot', 
+      \  'underscore', 
+      \])
 
 let s:fuzzy_custom_methods = 
       \ s:GetConfig('g:vim_imagine_fuzzy_custom_methods', {})
 
 let g:vim_imagine_fuzzy_favoured_words = 
       \ s:GetConfig('g:vim_imagine_fuzzy_favoured_words', [])
+
+let s:fuzzy_near = 
+      \ s:GetConfig('g:vim_imagine_fuzzy_nearness', [5, 0])
 
 let s:loaded_emmet_vim = exists('g:loaded_emmet_vim') 
       \&& g:loaded_emmet_vim
@@ -50,7 +60,7 @@ let s:chars_regexp = '\v[0-9A-Za-z_\-\\]'
 let s:splits = '(,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.,->,' 
 let s:snippets_path_example = 'setting/example_snippets.vim'
 let s:fuzzy_methods = {}
-let s:fuzzy_method = ''
+let s:fuzzy_method_display = ''
 " Avoid overuse of memory
 let s:fuzzy_chars_max_length = 15
 let s:type = ''
@@ -119,10 +129,22 @@ function! imagine#TabRemap(...) abort
   " Try fuzzy match
   if a:0 < 1
     let lines = getline(1, '$')
+    let [near_lines, far_lines] =
+          \ s:GetNearAndFarLines(lines, line('.'), s:fuzzy_near)
   endif
   unlet result
-  let result = s:TryFuzzy(chars, column, lines)
+  let result = s:TryFuzzy(chars, column, near_lines, s:fuzzy_near_chain)
   if result isnot 0
+    call s:LogMsg('Fuzzy range: near lines')
+    call s:SetType('Fuzzy')
+    return result
+  endif
+  unlet result
+  " Try all lines as chain is changed
+  let result = s:TryFuzzy(chars, column, lines, s:fuzzy_chain)
+  if result isnot 0
+    call s:LogMsg('Fuzzy range: all lines')
+    call s:SetType('Fuzzy')
     return result
   endif
 
@@ -136,6 +158,15 @@ function! imagine#TabRemap(...) abort
   call s:LogMsg('-------- Not matched ----------')
   return ''
 endfunc
+
+" Get near and far lines
+
+function! s:GetNearAndFarLines(lines, current, near)
+  let range = [a:current - a:near[0] - 1, a:current + a:near[1] - 1]
+  let near_lines = a:lines[range[0]:range[1]]
+  let far_lines = a:lines[0:range[0]] + a:lines[range[1]:]
+  return [near_lines, far_lines]
+endfunction
 
 " Move cursor for snippet match
 function! imagine#Move()
@@ -197,7 +228,7 @@ function! s:SetType(type) abort
   if a:type != ''
     call s:LogMsg('Type: '.a:type)
     if a:type == 'Fuzzy'
-      call s:LogMsg('-------- End with '.a:type.', '.s:fuzzy_method.' ----------')
+      call s:LogMsg('-------- End with '.a:type.', '.s:fuzzy_method_display.' ----------')
     else
       call s:LogMsg('-------- End with '.a:type.' ----------')
     endif
@@ -228,7 +259,7 @@ function! s:TryFavoured(chars) abort
 
     call s:LogMsg('Method: Favour')
     call s:LogMsg('Regexp: '.regexp)
-    let s:fuzzy_method = 'Favour'
+    let s:fuzzy_method_display = 'Favour'
     return result
   else
     return []
@@ -292,15 +323,14 @@ function! s:TrySnippet(chars, column) abort
   endif
 endfunction
 
-function! s:TryFuzzy(chars, column, lines) abort
+function! s:TryFuzzy(chars, column, lines, chain) abort
   let length = len(a:chars)
 
   if (length > 1 && length < s:fuzzy_chars_max_length)
-    let result = TryFuzzyChain(a:chars, a:lines)
+    let result = TryFuzzyChain(a:chars, a:lines, a:chain)
 
     if !s:InvalidRet(result, a:chars)
       let result_word = result[0]
-      call s:SetType('Fuzzy')
       if mode() == 'i'
         call complete(a:column - length, [result_word])
         return ''
@@ -330,15 +360,15 @@ function! s:RemoveLeaderSpaces(val) abort
   return substitute(a:val, '\v^\s+', '', '')
 endfunction
 
-function! TryFuzzyChain(chars, lines) abort
+function! TryFuzzyChain(chars, lines, chain) abort
   let chars = a:chars
 
-  let s:fuzzy_method = ''
+  let s:fuzzy_method_display = ''
   call s:LogMsg('Try fuzzy')
-  call s:LogMsg('Fuzzy chain: '.join(s:fuzzy_chain, ', '))
+  call s:LogMsg('Fuzzy chain: '.join(a:chain, ', '))
 
   let result = s:TryFavoured(chars)
-  for method in s:fuzzy_chain
+  for method in a:chain
     if s:InvalidRet(result, chars)
       let result = s:CallFuzzyMethod(method, chars, a:lines)
     endif
@@ -389,7 +419,7 @@ function! s:CallFuzzyMethod(method, chars, lines) abort
   " Log
   call s:LogMsg('Method: '.method)
   call s:LogMsg('Regexp: '.regexp)
-  let s:fuzzy_method = method
+  let s:fuzzy_method_display = method
 
   " Return
   let result = sort(result, "s:LengthDecrement")
@@ -426,9 +456,9 @@ function! s:fuzzy_methods.capital(chars)
 endfunction
 
 function! s:fuzzy_methods.dot(chars)
-  let regexp = join(split(a:chars, '\zs'), '[^.]*\.')
+  let regexp = join(split(a:chars, '\zs'), '[^._]*\.')
   let regexp = s:EscapeRegexp(regexp)
-  let regexp = '\v^(\@|\$)?'.regexp.'[^.]*>'
+  let regexp = '\v^(\@|\$)?'.regexp.'[^._]*>'
   return regexp
 endfunction
 
