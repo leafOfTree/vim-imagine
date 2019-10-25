@@ -44,8 +44,11 @@ It will return the snippet if the characters before the cursor match the key in 
 
 ### Extensible fuzzy search <a name="fuzzy_match"></a>
 
-It will return the first match that fuzzy methods find in current file. The order can be changed by [g:vim_imagine_fuzzy_chain](#fuzzy_chain) except the `favoured` method. 
-The longest will be used if there are more than one matched words.
+It returns the first match that fuzzy methods find in current file. The order can be changed by [g:vim_imagine_fuzzy_chain](#fuzzy_chain) except the `favoured` method. 
+
+The longest is used if there are more than one matched words.
+
+The fuuzy search will try lines near current line first, then all the lines. See [fuzzy_near](#fuzzy_near).
 
 #### Builtin methods
 
@@ -125,14 +128,14 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
     ```vim
     let g:vim_imagine_fuzzy_chain = [
         \'capital', 
-        \'hyphen', 
         \'dot', 
+        \'hyphen', 
         \'underscore', 
         \'include',
         \]
     ```
 
-#### g:vim_imagine_fuzzy_near
+#### g:vim_imagine_fuzzy_near <a name="fuzzy_near"></a>
 
 - description: the top and bottom offset to current line which defines the lines to search first.
 - type: `list`.
@@ -151,8 +154,8 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
     ```vim
     let g:vim_imagine_fuzzy_chain = [
         \'capital', 
-        \'hyphen', 
         \'dot', 
+        \'hyphen', 
         \'underscore', 
         \'include',
         \]
