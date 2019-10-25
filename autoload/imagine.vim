@@ -38,8 +38,7 @@ let s:fuzzy_custom_methods =
 let g:vim_imagine_fuzzy_favoured_words = 
       \ s:GetConfig('g:vim_imagine_fuzzy_favoured_words', [])
 
-let s:fuzzy_near = 
-      \ s:GetConfig('g:vim_imagine_fuzzy_near', [5, 0])
+let s:fuzzy_near = s:GetConfig('g:vim_imagine_fuzzy_near', [5, 0])
 
 let s:loaded_emmet_vim = exists('g:loaded_emmet_vim') 
       \&& g:loaded_emmet_vim
