@@ -4,10 +4,10 @@
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:vim_imagine_debug = 0
-let g:vim_imagine_matchchain = [
+let g:vim_imagine_fuzzy_chain = [
       \'capital', 
-      \'hyphen', 
       \'dot', 
+      \'hyphen', 
       \'underscore', 
       \'include',
       \]
@@ -33,12 +33,20 @@ let s:test.lines = [
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Run test
 function! s:test.run(test_data, test_name)
-  if len(a:test_data) != 2
-    call s:LogWarningMsg('test_data should be a list of length 2')
+  if len(a:test_data) < 2
+    call s:LogWarningMsg('test_data should be a list of length 2 or 3')
   endif
-  let [line, expect] = a:test_data
+
+  if len(a:test_data) == 2
+    let [line, expect] = a:test_data
+    let lines = self.lines
+  elseif len(a:test_data) == 3
+    let [lines, line, expect] = a:test_data
+  endif
+
   let column = len(line) + 1
-  let ret = imagine#TabRemap(line, column, self.lines)
+  let ret = imagine#TabRemap(line, column, lines, [])
+
   if ret != expect
     let msg = a:test_name.' failed. '
           \.'Return '.ret.', expect '.expect
@@ -47,6 +55,16 @@ function! s:test.run(test_data, test_name)
     let msg = a:test_name.' passed. '
     call s:LogMsg(msg)
   endif
+endfunction
+
+function s:StartTest()
+  call s:LogMsg('--------- Test starts ------------')
+  for key in keys(s:test)
+    if key != 'lines' && key != 'run'
+      let test_data = s:test[key]()
+      call s:test.run(test_data, key)
+    endif
+  endfor
 endfunction
 
 " Log
@@ -60,8 +78,16 @@ function! s:LogMsg(msg)
   echom '[Test]: '.a:msg
 endfunction
 
-" Define test case
-" Format: test_data = [input, output]
+
+"}}}
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Test cases {{{
+"
+" Format: test_data = [lines, input, output] | [input, output]
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! s:test.Prior()
   let g:vim_imagine_fuzzy_favoured_words = ['super', 'men', 'hero']
   let test_data = ['he', 'hero']
@@ -84,36 +110,46 @@ function! s:test.DirectMatch()
 endfunction
 
 function! s:test.FuzzyMatch_capital()
-  let test_data = ['cwm', "componentWillMount"]
-  return test_data
+  return [
+        \['import React from react componentWillMount () {...}'],
+        \'cwm', 
+        \"componentWillMount"
+        \]
 endfunction
 
 function! s:test.FuzzyMatch_dot()
-  let test_data = ['dba', "document.body.append"]
-  return test_data
+  return ['dba', "document.body.append"]
 endfunction
 
 function! s:test.FuzzyMatch_hyphen()
-  let test_data = ['vid', "vim_imagine_debug"]
-  return test_data
+  return ['vid', "vim_imagine_debug"]
 endfunction
 
 function! s:test.FuzzyMatch_include()
-  let test_data = ['txt', "contexts"]
-  return test_data
+  return ['txt', "contexts"]
 endfunction
 
-function s:StartTest()
-  call s:LogMsg('--------- Test starts ------------')
-  for key in keys(s:test)
-    if key != 'lines' && key != 'run'
-      let test_data = s:test[key]()
-      call s:test.run(test_data, key)
-    endif
-  endfor
+function! s:test.FuzzyMatch_mix()
+  return [
+        \['abc.def', 'abc_def', 'abc-def'],
+        \'ad',
+        \'abc.def',
+        \]
+endfunction
+function! s:test.FuzzyMatch_mix_underscore()
+  return [
+        \['abc.def', 'abc_def', 'abc-def'],
+        \'a_d',
+        \'abc_def',
+        \]
+endfunction
+function! s:test.FuzzyMatch_mix_hyphen()
+  return [
+        \['abc.def', 'abc_def', 'abc-def'],
+        \'a-d',
+        \'abc-def',
+        \]
 endfunction
 
 call s:StartTest()
-"}}}
-
 " vim: fdm=marker

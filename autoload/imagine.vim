@@ -19,16 +19,16 @@ let s:snippets_path =
 let s:fuzzy_chain = s:GetConfig('g:vim_imagine_fuzzy_chain',  
       \[
       \  'capital', 
-      \  'hyphen', 
       \  'dot', 
+      \  'hyphen', 
       \  'underscore', 
       \  'include',
       \])
 let s:fuzzy_near_chain = s:GetConfig('g:vim_imagine_fuzzy_near_chain',  
       \[
       \  'capital', 
-      \  'hyphen', 
       \  'dot', 
+      \  'hyphen', 
       \  'underscore', 
       \])
 
@@ -88,6 +88,7 @@ function! imagine#TabRemap(...) abort
     let line = a:1
     let column = a:2
     let lines = a:3
+    let near_lines = a:4
   else
     " Read user context
     let line = getline('.')
@@ -132,17 +133,17 @@ function! imagine#TabRemap(...) abort
           \ s:GetNearAndFarLines(lines, line('.'), s:fuzzy_near)
   endif
   unlet result
+  call s:LogMsg('Fuzzy range: near lines')
   let result = s:TryFuzzy(chars, column, near_lines, s:fuzzy_near_chain)
   if result isnot 0
-    call s:LogMsg('Fuzzy range: near lines')
     call s:SetType('Fuzzy')
     return result
   endif
   unlet result
-  " Try all lines as chain is changed
+  " Try all lines as fuzzy_chain is changed
+  call s:LogMsg('Fuzzy range: all lines')
   let result = s:TryFuzzy(chars, column, lines, s:fuzzy_chain)
   if result isnot 0
-    call s:LogMsg('Fuzzy range: all lines')
     call s:SetType('Fuzzy')
     return result
   endif
