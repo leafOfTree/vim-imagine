@@ -456,9 +456,9 @@ function! s:fuzzy_methods.capital(chars)
 endfunction
 
 function! s:fuzzy_methods.dot(chars)
-  let regexp = join(split(a:chars, '\zs'), '[^._]*\.')
+  let regexp = join(split(a:chars, '\zs'), '[^.]*\.')
   let regexp = s:EscapeRegexp(regexp)
-  let regexp = '\v^(\@|\$)?'.regexp.'[^._]*>'
+  let regexp = '\v^(\@|\$)?'.regexp.'[^.]*$'
   return regexp
 endfunction
 
