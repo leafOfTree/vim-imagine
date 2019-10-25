@@ -132,6 +132,33 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
         \]
     ```
 
+#### g:vim_imagine_fuzzy_near
+
+- description: the top and bottom offset to current line which defines the lines to search first.
+- type: `list`.
+- default: 
+
+    ```vim
+    let g:vim_imagine_fuzzy_near = [5, 0]
+    ```
+
+#### g:vim_imagine_fuzzy_near_chain <a name="fuzzy_near_chain"></a>
+
+- description: the order of methods that fuzzy near search uses.
+- type: `list`.
+- default: 
+
+    ```vim
+    let g:vim_imagine_fuzzy_chain = [
+        \'capital', 
+        \'hyphen', 
+        \'dot', 
+        \'underscore', 
+        \'include',
+        \]
+    ```
+
+
 #### g:vim_imagine_fuzzy_custom_methods <a name="fuzzy_custom_methods"></a>
 
 - description: defines custom methods that fuzzy search uses.
