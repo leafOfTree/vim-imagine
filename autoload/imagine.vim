@@ -38,6 +38,7 @@ let s:fuzzy_custom_methods =
 let g:vim_imagine_fuzzy_favoured_words = 
       \ s:GetConfig('g:vim_imagine_fuzzy_favoured_words', [])
 
+" [above, below]
 let s:fuzzy_near = s:GetConfig('g:vim_imagine_fuzzy_near', [5, 0])
 
 let s:loaded_emmet_vim = exists('g:loaded_emmet_vim') 
@@ -55,8 +56,9 @@ let s:name = 'vim-imagine'
 let s:first_char_regexp = '\v[0-9A-Za-z$_\-{[(<>`]'
 let s:chars_regexp = '\v[0-9A-Za-z_\-\\]'
 
-" Space and comma are added by default
-let s:splits = '(,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.,->,' 
+" Lines are splited to words, space and comma are added by default
+let s:splits = '(,),{,},<,>,[,],=,:,'',",;,/,\,+,!,#,*,`,|,.,->,?' 
+
 let s:snippets_path_example = 'setting/example_snippets.vim'
 let s:fuzzy_methods = {}
 let s:fuzzy_method_display = ''
@@ -133,7 +135,7 @@ function! imagine#TabRemap(...) abort
           \ s:GetNearAndFarLines(lines, line('.'), s:fuzzy_near)
   endif
   unlet result
-  call s:LogMsg('Fuzzy range: near lines')
+  call s:LogMsg('Fuzzy range: near lines '.near_lines[0].near_lines[1])
   let result = s:TryFuzzy(chars, column, near_lines, s:fuzzy_near_chain)
   if result isnot 0
     call s:SetType('Fuzzy')
@@ -160,7 +162,6 @@ function! imagine#TabRemap(...) abort
 endfunc
 
 " Get near and far lines
-
 function! s:GetNearAndFarLines(lines, current, near)
   let range = [a:current - a:near[0] - 1, a:current + a:near[1] - 1]
   let near_lines = a:lines[range[0]:range[1]]
@@ -289,6 +290,7 @@ function! s:TrySnippet(chars, column) abort
   let dict_2 = g:vim_imagine_dict_2
 
   let length = len(a:chars)
+  
   let default = ''
   let result = get(dict, a:chars, default)
   if result == default
@@ -431,7 +433,7 @@ function! s:GetSplitsRegExp(splits)
   let splits = substitute(a:splits, ',\+', ',', 'g')
   " Escape every char
   let escaped_splits = substitute(splits, '\([^,]\)', '\\\1', 'g')
-  let splits_regexp = '\v(\s|,|' . join(split(escaped_splits, ','), '|') . ')'
+  let splits_regexp = '\v(\s|,|，|。|' . join(split(escaped_splits, ','), '|') . ')'
   return splits_regexp
 endfunction
 
@@ -463,7 +465,7 @@ function! s:fuzzy_methods.dot(chars)
 endfunction
 
 function! s:fuzzy_methods.dot_splits(splits)
-  return substitute(a:splits, '\.' , '', 'g')
+  return substitute(a:splits, '\.\|\[\|\]' , '', 'g')
 endfunction
 
 function! s:fuzzy_methods.underscore(chars)
