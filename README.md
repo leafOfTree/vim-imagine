@@ -137,7 +137,7 @@ Special characters like `\r`, `\t`, `\e` are supported in double quoted string(s
 
 #### g:vim_imagine_fuzzy_near <a name="fuzzy_near"></a>
 
-- description: the top and bottom offset to current line which defines the lines to search first.
+- description: the top and bottom offset to current line which defines the lines to search first. Both of offsets are positive value.
 - type: `list`.
 - default: 
 
