@@ -135,7 +135,7 @@ function! imagine#TabRemap(...) abort
           \ s:GetNearAndFarLines(lines, line('.'), s:fuzzy_near)
   endif
   unlet result
-  call s:LogMsg('Fuzzy range: near lines '.near_lines[0].near_lines[1])
+  call s:LogMsg('Fuzzy range: near lines '.s:fuzzy_near[0].', '.s:fuzzy_near[1])
   let result = s:TryFuzzy(chars, column, near_lines, s:fuzzy_near_chain)
   if result isnot 0
     call s:SetType('Fuzzy')
