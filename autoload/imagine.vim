@@ -18,7 +18,7 @@ let s:snippets_path =
 
 let s:fuzzy_chain = s:GetConfig('g:vim_imagine_fuzzy_chain',  
       \[
-      \  'capital', 
+      \  'capital_except_first',
       \  'dot', 
       \  'hyphen', 
       \  'underscore', 
@@ -26,7 +26,7 @@ let s:fuzzy_chain = s:GetConfig('g:vim_imagine_fuzzy_chain',
       \])
 let s:fuzzy_near_chain = s:GetConfig('g:vim_imagine_fuzzy_near_chain',  
       \[
-      \  'capital', 
+      \  'capital_except_first',
       \  'dot', 
       \  'hyphen', 
       \  'underscore', 
@@ -448,11 +448,19 @@ function! s:fuzzy_methods.hyphen(chars)
   return regexp
 endfunction
 
-function! s:fuzzy_methods.capital(chars)
+function! s:fuzzy_methods.capital_except_first(chars)
   let regexp = substitute(a:chars, '\v.\zs\w+', '\U\0', 'g')
   let regexp = join(split(regexp, '\zs'), '\U*')
   let regexp = s:EscapeRegexp(regexp)
-  let regexp = '['.regexp[0].toupper(regexp[0]).']'.regexp[1:]
+  let regexp = '['.regexp[0].']'.regexp[1:]
+  let regexp = '\v\C^(\@|\$)?'.regexp.'\U*>'
+  return regexp
+endfunction
+
+function! s:fuzzy_methods.capital(chars)
+  let regexp = toupper(a:chars)
+  let regexp = join(split(regexp, '\zs'), '\U*')
+  let regexp = s:EscapeRegexp(regexp)
   let regexp = '\v\C^(\@|\$)?'.regexp.'\U*>'
   return regexp
 endfunction
